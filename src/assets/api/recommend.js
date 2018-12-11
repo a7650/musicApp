@@ -1,12 +1,12 @@
 import jsonp from 'common/js/jsonp'
-import {commonParams, options} from './config'
+import {commonParams, options,PRODUCTION} from './config'
 import axios from 'axios'
 import { promises } from 'fs';
 
 
 
 export function getDiscList(){
-    const url = 'http://106.12.198.147/music/api/getDiscList';
+    const url = PRODUCTION ? 'http://106.12.198.147/music/api/getDiscList' : '/getDiscList';
     const data = Object.assign({},commonParams,{
         picmid:1,
         rnd:0.3907097673865849,
@@ -45,8 +45,7 @@ export function getRadioList(){
 
 
 export function getDiscSongList(mid){
-  const url = 'http://106.12.198.147/music/api/getDiscSongList';
-  // const url = "http://106.12.198.147/music/getDiscSongList";
+  const url = PRODUCTION ? 'http://106.12.198.147/music/api/getDiscSongList' : '/getDiscSongList';
   const data = Object.assign({},commonParams,{
     type:1,
     json:1,

@@ -83,6 +83,8 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@import "~common/stylus/variable.less";
+
 .time-control{
             height: 30px;
             box-sizing: border-box;
@@ -97,12 +99,12 @@ export default {
             .process{
                 flex: 1;
                 height: 2px;
-                background: rgba(225, 225, 225, .5);
+                background: rgba(225, 225, 225, .3);
                 position: relative;
                 margin: 0 10px;
                 .played{
                     height: 100%;
-                    background:rgb(8, 211, 42);
+                    background:#fff;
                 }
                 .now{
                     width: 14px;

@@ -13,3 +13,28 @@ export function shuffle(arr){
     }
     return arr; 
 }
+
+export function filterArray(searchText,originArray,attribute){
+    if(searchText.trim() == ""){
+        return originArray
+    }
+    else{
+        return originArray.filter(item => {
+            return item[attribute].toLowerCase().indexOf(searchText.trim().toLowerCase()) > -1;
+        })
+    }
+
+}
+export function formateHot(x){
+    switch(true){
+        case x<10000 : 
+            return x;
+            break;
+        case x<10000000 : 
+            return (x/10000).toFixed(1)+"万";
+            break;
+        default : 
+            return (x/10000000).toFixed(1)+"千万";
+            break;
+    }
+}

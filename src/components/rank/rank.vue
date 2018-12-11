@@ -2,7 +2,7 @@
     <div class="rank" ref="rank">
         <scroll :data="topList" class="list-content" ref="listContent">
         <ul class="top-list">
-            <li v-for="item in topList" :key="item.id">
+            <li v-for="item in topList" :key="item.id" @click="selectList(item)">
                 <div class="list-icon">
                     <img v-lazy="item.picUrl">
                 </div>
@@ -16,8 +16,9 @@
                 </div>
             </li>
         </ul>
-        <div class="loading-container" v-if="!topList.length"><loading></loading></div>
+        <loading v-if="!topList.length"></loading>
         </scroll>
+        <router-view></router-view>
     </div>
 </template>
 
@@ -26,7 +27,7 @@ import {getRankList} from 'api/rank'
 import scroll from 'base/scroll/scroll'
 import loading from 'base/loading/loading'
 import {adaptMiniPlay} from 'common/js/mixin'
-
+import {mapMutations} from 'vuex'
 export default {
     mixins:[adaptMiniPlay],
     data(){
@@ -47,10 +48,23 @@ export default {
         _getRankList(){
             getRankList().then(data => {
                 this.topList=data.topList;
+                console.log(this.topList);
             },err => {
                 console.log(err);
             })
-        }
+        },
+        selectList(item){
+            this.$router.push({
+                    name:"rankDetail",
+                    params:{
+                        topid:item.id
+                    }
+                });
+            this.SET_SINGER(item);
+        },
+        ...mapMutations([
+            "SET_SINGER"
+        ])
     },
     created(){
         this._getRankList();
@@ -72,12 +86,6 @@ export default {
     position: relative;
     height: 100%;
     overflow: hidden;
-}
-.loading-container{
-    position: absolute;
-    width: 100%;
-    top: 50%;;
-    transform: translateY(-50%);
 }
 .top-list{
     display: flex;
@@ -103,13 +111,15 @@ export default {
         height: 100px;
         box-sizing: border-box;
         padding:10px;
-        background-color:@color-highlight-background;
+        background-color:#fff;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        color: @color-text-ll;
+        color: @color-theme;
+        background: rgb(245, 245, 245);
+        box-shadow: 0 0 5px rgba(0, 0, 0, .15);
         .title{
-            font-size: 120%;
+            font-weight: bold;
             .no-wrap;
         }
         .song-list{
@@ -121,7 +131,7 @@ export default {
                     font-size: 80%;
                 }
                 .singer-name{
-                    color:@color-text-l;
+                    color:@color-text-d;
                     white-space: nowrap;
                 }
             }

@@ -1,10 +1,10 @@
 import jsonp from 'common/js/jsonp'
-import {commonParams, options} from './config'
+import {commonParams, options,PRODUCTION} from './config'
 import axios from 'axios'
 
 
 export function getSingerList(){
-    const url = 'http://106.12.198.147/music/api/getSingerList';
+    const url = PRODUCTION ? 'http://106.12.198.147/music/api/getSingerList' : '/getSingerList';
     const data = Object.assign({},commonParams,{
         loginUin:0,
         hostUin:0,
@@ -21,7 +21,7 @@ export function getSingerList(){
 }
 
 export function getSongList(mid,begin,num){
-    const url = 'http://106.12.198.147/music/api/getSongList';
+    const url = PRODUCTION ? 'http://106.12.198.147/music/api/getSongList' : '/getSongList';
     const data = Object.assign({},commonParams,{
         loginUin: 0,
         hostUin: 0,

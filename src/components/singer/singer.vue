@@ -55,7 +55,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
-
+.singer{
+    background:#fff;
+    width: 100%;
+    position: absolute;
+    top: 44px;
+    bottom: 0;
+}
 
 </style>
 

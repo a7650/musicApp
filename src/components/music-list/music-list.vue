@@ -6,18 +6,17 @@
         </header>
         <div class="wrapper" ref="wrapper" :style="wrapperStyle">
             <div class="bg" ref="bg" :style="bgStyle">
-                <div class="filter"></div>
             </div>
+            <div class="filter"></div>
             <div class="title2">{{title}}</div>
         </div>
         <div class="scroll-area">
-            <div class="play" @click="randomPlay" :style="playStyle">随机播放全部歌曲 <i class="icon-play"></i></div>
+            <div class="play" @click="randomPlay" :style="playStyle">随机播放全部 <i class="icon-play"></i></div>
             <scroll class="song-content" ref="songContent" :data="songList"   @scroll="scroll" :listenScroll="true" :probeType="3" >
                 <div class="scroll-bg" ref="scrollBg">
                     <song-list :songList="songList"  @selectSong="_selectSong"></song-list>
                 </div>
-                <div class="loading-container" v-if="!songList.length"><loading></loading></div>
-                
+                <loading v-if="!songList.length"></loading>
             </scroll>
         </div>
     </div>
@@ -148,7 +147,7 @@ export default {
     left:0;
     bottom: 0;
     right: 0;
-    background: @color-background;
+    background: #fff;
     header{
         position: absolute;
         width: 100%;
@@ -168,7 +167,7 @@ export default {
         float: left;
         width: 80%;
         text-align: center;
-        color:#fff;
+        color:@color-text;
         .no-wrap;
     }
     .wrapper{
@@ -191,9 +190,9 @@ export default {
         .filter{
            position: absolute;
             top: 0;
+            bottom: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
             background: rgba(0, 0, 0,.3);
         }
         .title2{
@@ -232,14 +231,8 @@ export default {
         top: 0;
         bottom: 0;
         width: 100%;
-        .loading-container{
-             position: absolute;
-            width: 100%;
-            top: 50%;;
-            transform: translateY(-50%);
-        }
         .scroll-bg{
-            background:@color-background;
+            background:#fff;
             padding-top:20px;
             min-height: 100%;
         }

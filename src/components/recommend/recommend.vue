@@ -7,17 +7,20 @@
             <div class="slider-content" ref="aaa" >
                 <slider :recommends="recommends"   @sliderHeight="_sliderHeight">
                 </slider>
+                
             </div>
         </div>
-        <div class="scroll-area">
-        <scroll :data="discList" class="recommend-content" ref="recommendContent" :style="recommendStyle">
+        <div class="scroll-area" :style="sliderFilter">
+        <scroll :data="discList" class="recommend-content" ref="recommendContent"  @scroll="scroll" :listenScroll="true" :probeType="3">
             <div class="recommend-songs">
                 <h5 v-if="discList.length">热门歌单推荐</h5>
                 <ul class="disc-list">
                     <li v-for="item in discList" :key="item.listnum" @click="selectDisc(item)" >
-                        <div class="disc-icon"><img v-lazy="item.imgurl" alt=""></div>
+                        <div class="disc-icon"><img :src="item.imgurl" alt=""></div>
+                        <div class="filter"></div>
                         <div class="disc-text">
-                            <span class="title">{{item.creator.name | _discTitle}}</span>
+                            <div class="title">{{item.creator.name | _discTitle}}</div>
+                            <div class="line"></div>
                             <div class="text">{{item.dissname}}</div>
                         </div>
                     </li>
@@ -48,14 +51,24 @@ export default {
             discList:[],
             currentDot:-1,
             searchText:"",
-            sliderHeight:0
+            sliderHeight:0,
+            scrollY:0
         }
     },
     computed:{
-        recommendStyle(){
-            return {
-                "top" : `${this.sliderHeight}px`
-            }
+        // recommendStyle(){
+        //     return {
+        //         "top" : `${this.sliderHeight}px`
+        //     }
+        // },
+        sliderFilter(){
+                if(-this.scrollY > 0 && -this.scrollY<this.sliderHeight){
+                    let opacity = this.rang(-this.scrollY,this.sliderHeight,1);
+                    return {
+                        "background":`rgba(0,0,0,${opacity})`
+                    }
+                }
+            
         }
     },
     components:{
@@ -72,6 +85,8 @@ export default {
         },
         _sliderHeight(x){
             this.sliderHeight = x;
+            this.$refs.recommendContent.$el.style.top = x+"px";
+            this.$refs.recommendContent.refresh();
         },
         _getRadioList(){
                 getRadioList().then(data => {
@@ -98,6 +113,12 @@ export default {
             });
             this.SET_SINGER(item);
         },
+        scroll(pos){
+            this.scrollY = parseInt(pos.y);
+        },
+        rang(now,total,max){
+            return Math.min( max*now/total,max)
+        },
         ...mapMutations([
             "SET_SINGER"
         ])
@@ -118,32 +139,24 @@ export default {
 </script>
 <style lang="less" scoped>
 @import "~common/stylus/variable.less";
+@import "~common/stylus/mixin.less";
 
 .recommend{
     position:fixed;
     width: 100%;
     top:44px;
     bottom:0;//设置 fixed top bottom 使该元素获得固定的高度
-    .tip{
-        width: 100%;
-        text-align: center;
-        padding-top: 5px;
-        color: @color-text-d;
-        position: absolute;
-        top:44px;
-        z-index: -999;
-    }
     .search{
         padding:8px ; 
+        background: @color-theme;
         input{
             width: 100%;
             height: 27px;
-            background: @color-highlight-background;
-            color:gray;
+            background: @color-theme-d;
             border-radius: 3px;
-            color: @color-text-d;
-            text-align: center;
+            color: @color-text-ll;
         } 
+        .placeholderStyle();
     }
     .scroll-area{
         position: fixed;
@@ -158,9 +171,16 @@ export default {
         position: absolute;//为了使该元素高度固定，则子元素的高度会大于该元素，就可以用scroll
         bottom: 0;
         width: 100%;
+        
     }
     .slider-content{
         width: 100%;
+        .tip{
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+            color: @color-background-d;
+        }
     }
     .loading-container{
         position: absolute;
@@ -176,33 +196,50 @@ export default {
             color: @color-theme;
         }
         .disc-list{
+            padding: 0 10px;
             li{
-                padding:0 10px 0 20px;
                 width:100%;
-                display:flex;
-                height:60px;
-                margin-bottom:30px;
+                height:100px;
+                margin-bottom:20px;
+                border-radius: 2px;
                 box-sizing:border-box;
+                overflow: hidden;
+                position: relative;
+                box-shadow: 0 0 5px rgba(0, 0, 0, .3);
                 .disc-icon{
+                    width: 100px;
+                    height: 100%;
+                    position: absolute;
+                    right: 0;
                     img{
-                        width:60px;
-                        flex-basis:60px;
+                        max-width: 100%;
+                        height: 100px;
+                        // filter: blur(5px);
+                        
                     }
                 }
                 .disc-text{
-                    box-sizing:border-box;
-                    padding:5px 0;
-                    padding-left:20px;
-                    flex:1;
-                    display:flex;
-                    flex-direction:column;
-                    justify-content:space-between;
-                    align-items:flex-start;
+                   position: absolute;
+                   width: 50%;
+                   top: 20px;
+                   left: 10px;
+                   color: #000;
+                   text-align: left;
+                    .title{
+                        font-size: @font-size-large;
+                        font-weight: bold;
+                        margin-bottom: 10px;
+                    }
+                    .line{
+                        width: 40px;
+                        height: 4px;
+                        background-color: #000;
+                        margin-bottom: 10px;
+                    }
                     .text{
-                        color:rgba(255, 255, 255, 0.5);
-                         text-overflow: ellipsis;
-                         overflow: hidden;
-                         white-space: nowrap;
+                        color: @color-text-d;
+                        font-size: @font-size-medium;
+                        .no-wrap();
                     }
                 }
             }

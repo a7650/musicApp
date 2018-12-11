@@ -1,6 +1,37 @@
 <template>
     <rtol>
-    <music-list :title="singer.creator.name" :bg="singer.imgurl" :songList="songList"  class="singer-detail"></music-list>
+        <div class="disc-detail">
+            <div class="bg" :style="bgStyle"></div>
+            <div class="filter"></div>
+            <header>
+               <div class="back" @click = "back"> <i class="icon-left"></i></div>
+               <div class="title">歌单</div>
+               <div class="more"><i class="icon-more"></i></div>
+            </header>
+            <div class="scroll-area">
+                <div class="text">
+                    <div class="logo">
+                        <img :src="this.singer.imgurl" alt="">
+                        <div class="hot">{{hot}}人收听</div>
+                    </div>
+                    <div class="other">
+                        <div class="title">{{title}}</div>
+                        <div class="dissname">{{dissname}}</div>
+                        <div class="tags"><span v-for="(tag,index) in tags" :key="index">{{tag.name}}</span></div>
+                        <div class="play"><i class="icon-play" @click="randomPlay"></i></div>
+                    </div>
+                </div>
+                <scroll class="desc" ref="desc" :data="desc" v-if="desc[0]">     
+                    <p  v-html="this.desc[0]"></p>
+                    <img src="./drop.png" alt="">
+                </scroll>
+                <scroll class="song-content" ref="songContent" :data="songList" @scroll="scroll" :listenScroll="true" :probeType="3">
+                    <discSonglist :songList="songList" @selectSong="_selectSong" ref="disSonglist">
+                    </discSonglist>
+                    <loading v-if="!songList.length"></loading>
+                </scroll>
+            </div>
+        </div>
     </rtol>
 </template>
 
@@ -10,26 +41,64 @@ import {mapGetters} from 'vuex'
 import {getDiscSongList} from 'api/recommend'
 import {createSong,getSongVkey} from 'common/js/song'
 import rtol from 'base/animation/right-to-left'
-
+import scroll from 'base/scroll/scroll'
+import discSonglist from 'base/disc-songlist/disc-songlist'
+import {mapActions} from 'vuex'
+import {adaptMiniPlay} from 'common/js/mixin'
+import {shuffle} from 'common/js/tools'
+import {formateHot} from 'common/js/tools'
+import loading from 'base/loading/loading'
 export default {
+    mixins:[adaptMiniPlay],
     data(){
         return {
-            songList:[]
+            songList:[],
+            title:"",
+            desc:[],
+            dissname:"",
+            tags:[],
+            hot:0
         }
     },
     computed:{
-        ...mapGetters([
+        bgStyle(){
+            return {
+                "background-image":`url(${this.singer.imgurl})`
+            }
+        },
+       ...mapGetters([
             "singer"
         ])
     },
     components:{
-        musicList,rtol
+        musicList,rtol,scroll,discSonglist,loading
     },
     methods:{
+        scroll(pos){
+            if(pos.y < 0){
+                this.$refs.disSonglist.$el.style.boxShadow = "0 -10px 10px rgba(0,0,0,.2)";
+            }
+            if(pos.y >= 0){
+                this.$refs.disSonglist.$el.style.boxShadow = "";
+            }
+        },
+        adaptMiniPlay(playList){
+            let bottom = playList.length>0 ? "15%" : 0;
+            this.$refs.songContent.$el.style.bottom = bottom;
+            this.$refs.songContent.refresh();
+        },
+        back(){
+            this.$router.back();
+        },
+        
         _getDiscSongList(){
             getDiscSongList(this.singer.dissid).then( data => {
                 this.songList = this._encaseSongList(data.songlist);
-                console.log(this.songList);
+                this.desc[0] = data.desc;
+                this.dissname = data.dissname;
+                this.title = data.nickname;
+                this.tags = data.tags;
+                this.hot = formateHot(data.visitnum);
             })
         },
         _encaseSongList(list){
@@ -43,16 +112,207 @@ export default {
                 })
             })
             return result;
-        }
+        },
+        randomPlay(){
+            let randomList = shuffle(this.songList);
+            this.selectSong({
+                list:randomList,
+                index:0
+            })
+        },
+        _selectSong(song,index,filterList){
+            this.selectSong({
+                list:[...filterList],
+                index
+            })
+        },
+        ...mapActions([
+            "selectSong"
+        ])
     },
     created(){
         this._getDiscSongList();
+    },
+    mounted(){
     }
 }
 </script>
 
 <style lang="less" scoped>
-.singer-detail{
-    animation-duration: 0.5s;
+@import "~common/stylus/variable";
+@import "~common/stylus/mixin";
+
+.disc-detail{
+    animation-duration: 0.3s;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: @color-background;
+    .bg{
+        width: 100%;
+        height: 0;
+        padding-top: 70%;
+        background-size: 110%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        filter: blur(20px);
+    }
+    .filter{
+        width: 100%;
+        height: 0;
+        padding-top: 70%;
+        background-size: 110%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, .7);
+    }
+    header{
+        color: @color-text;
+        width: 100%;
+        height: 40px;
+        position: fixed;
+        top: 0;
+        z-index: 99;
+        .back{
+            width:10%;
+            height:40px;
+            line-height: 40px;
+            text-align: center;
+            float: left;
+        }
+        .title{
+            width: 80%;
+            height: 40px;
+            line-height: 40px;
+            text-align:center;
+            float: left;
+        }
+        .more{
+            width: 10%;
+            height: 40px;
+            line-height: 40px;
+            float: left;
+            i{
+                font-size: 30px;
+            }
+        }
+    }
+    .scroll-area{
+        position: fixed;
+        top: 40px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+        padding: 0 20px;
+        .text{
+            padding: 10px 0;
+            display: flex;
+            flex-direction: row;
+            .logo{
+                width: 150px;
+                height: 150px;
+                position: relative;
+                img{
+                    width: 100%;
+                    height: 100%;
+                }
+                .hot{
+                    width: 100%;
+                    height: 20px;
+                    line-height: 20px;
+                    position: absolute;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, .3);
+                    color: #fff;
+                    font-size: @font-size-medium;
+                }
+            }
+            .other{
+                max-height: 150px;
+                box-sizing: border-box;
+                overflow: hidden;
+                flex: 1;
+                padding: 10px 10px 0 10px;
+                display: flex;
+                flex-direction: column;
+                .title{
+                    font-size: @font-size-large;
+                    font-weight:600;
+                    height: 20px;
+                    .no-wrap();
+                }
+                .dissname{
+                    flex: 1;
+                    font-size: @font-size-medium;
+                    margin-top: 10px;
+                }
+                .tags{
+                    height: 15px;
+                    margin-bottom: 15px;
+                    line-height: 15px;
+                    span{
+                        height: 100%;
+                        font-size: 13px;
+                        display: inline-block;
+                        padding:2px;
+                        margin-right: 5px;
+                        background: #fff;
+                        color: @color-text-d;
+                        border-radius: 7px;
+
+                    }
+                }
+                .play{
+                    height: 25px;
+                    i{
+                        font-size: 25px;
+                    }
+                }
+
+            }
+        }
+        .desc{
+            width: 100%;
+            min-height: 50px;
+            max-height: 100px;
+            background:#fff;
+            border-radius: 2px;
+            box-shadow: 0 0 7px rgba(0, 0, 0, .3);
+            box-sizing: border-box;
+            overflow: hidden;
+            padding: 10px;
+            position: relative;
+            p{
+                padding: 10px 15px;
+                color: @color-text-d;
+                font-size: @font-size-medium;
+                line-height: 23px;
+            }
+            img{
+                width: 15px;
+                height: 30px;
+                position: absolute;
+                top: 50%;
+                right: 7px;
+                margin-top: -15px;
+            }
+        }
+        .song-content{
+            position: absolute;
+            top: 275px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            &>div{
+                background: #fff;
+            }
+        }
+    }
 }
+
 </style>

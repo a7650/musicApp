@@ -4,6 +4,7 @@
         <!-- main-player -->
         <div class="main-player"  v-show="fullScreen">
             <div class="bg" :style="bgStyle"></div>
+            <div class="bg2"></div>
             <!-- header -->
             <header>
                 <div class="back" @click="back"><i class="icon-back"></i></div>
@@ -51,17 +52,17 @@
                 <div class="icon mode" @click="toggleMode" >
                     <i :class="modeIcon"></i>
                 </div>
-                <div class="icon prev">
-                    <i class="icon-prev" @click="prevSong" :class="{unReady:!(readyPlay&&ready)}"></i>
+                <div class="icon prev" @click="prevSong">
+                    <i class="icon-prev"  :class="{unReady:!(readyPlay&&ready)}"></i>
                 </div>
-                <div class="icon i-center" @click="togglePlaying" >
+                <div class="icon center" @click="togglePlaying" >
                     <i :class="playingIcon"></i>
                 </div>
-                <div class="icon i-next">
-                    <i class="icon-next" @click="nextSong" :class="{unReady:!(readyPlay&&ready)}"></i>
+                <div class="icon next" @click="nextSong">
+                    <i class="icon-next"  :class="{unReady:!(readyPlay&&ready)}"></i>
                 </div> 
-                <div class="icon list">
-                    <i class="icon icon-list" @click="listShow=!listShow"></i>
+                <div class="icon list" @click="listShow=!listShow">
+                    <i class="icon icon-list" ></i>
                 </div>
             </div>
             </div>
@@ -75,7 +76,7 @@
            </div>
            <div class="song-desc"><span class="name">{{currentSong.name}}</span><span class="singer">{{currentSong.singer}}</span></div>
            <div class="icon">
-               <i :class="playingIcon" @click.stop="togglePlaying"></i>
+               <i :class="miniPlayingIcon" @click.stop="togglePlaying"></i>
                <i class="icon-list" @click.stop="listShow=!listShow"></i>
            </div>
         </div>
@@ -140,9 +141,15 @@ export default {
         },
         playingIcon(){
             return{
-                "icon-pause":this.playing,
-                 "icon-play":!this.playing,
+                "icon-pause2":this.playing,
+                 "icon-play2":!this.playing,
                  "unReady":!(this.readyPlay&&this.ready)
+            }
+        },
+        miniPlayingIcon(){
+            return {
+                "icon-pause":this.playing,
+                 "icon-play":!this.playing
             }
         },
         cdRotate(){
@@ -169,7 +176,7 @@ export default {
         audioReadyPlay(){
             this.readyPlay = true;
             if(this.currentLyric){
-                this.currentLyric.play()
+                this.currentLyric.seek(this.nowTime*1000);
             }
         },
         timeupdate(){
@@ -445,18 +452,26 @@ export default {
     right: 0;
     display: flex;
     flex-direction: column;
-    background-color: @color-background;
+    background-color:#fff;
     animation-duration: 0.3s;
     .bg{
         position:fixed;
-        width: 100%;
-        height: 100%;
+        width: 130%;
+        height: 130%;
+        top: -50px;
+        left: -50px;
         background-repeat: no-repeat;
-        background-size:cover;
+        background-size:200%;
         background-position: center;
         filter: blur(30px);
-        opacity: 0.7;
         z-index: -99;
+    }
+    .bg2{
+        position:fixed;
+        width: 100%;
+        height: 100%;
+        z-index: -98;
+        background: rgba(0, 0, 0, 0.3);
     }
     header{
         width: 100%;
@@ -619,7 +634,7 @@ export default {
                     box-sizing: border-box;
                     padding: 10px 20px;
                     width: 100%;
-                    color: @color-text-l;
+                    color: rgba(255, 255, 255, 0.4);
                 }
                 .active{
                     color: #fff;
@@ -645,7 +660,7 @@ export default {
                 text-align: center;
                 i{
                     font-size:30px;
-                    color:#fff;
+                    color: #fff;
                     &.unReady{
                         color: rgba(225, 225, 225, .5);
                     }
@@ -654,32 +669,49 @@ export default {
             .mode{
                 i{
                     font-size: @font-size-large-x;
+                    font-weight: bold;
                 }
             }
-            .i-center i{
-                font-size: 40px;
+            .prev,.next{
+                i{
+                    font-size: @font-size-large-x;
+                }
             }
-
+            .center{
+                i{
+                    display:inline-block;
+                    width: 50px;
+                    height: 50px;
+                    line-height: 50px;
+                    text-align: center;
+                    background-color:rgba(255, 255, 255, 0.1);
+                    border-radius: 25px;
+                    font-size: 30px;
+                    color: #fff;   
+                }
+            }
         }
     }
 }
 
 .mini-player{
     position: fixed;
-    top: 90%;
+    top: 92%;
     bottom:0;
     left: 0;
     right: 0;
-    background: @color-highlight-background;
+    background: @color-background;
     z-index: 100;
-    padding: 10px;
+    padding: 5px;
     display: flex;
     align-items: center;
+    border-top: 1px solid rgba(0, 0, 0, .1);
     .mini-img{
-        width: 12%;
+        width: 10%;
         height: 0;
-        padding-top: 12%;
+        padding-top: 10%;
         position: relative;
+        margin-left: 10px;
         &>div{
             position: absolute;
             top: 0;
@@ -705,11 +737,13 @@ export default {
         flex-direction: column;
         justify-content: center;
         height: 100%;
-        width: 70%;
+        width: 65%;
         box-sizing: border-box;
         padding: 0 30% 0 10px;
         .name{
+            color: @color-theme;
             .no-wrap;
+            font-size: @font-size-medium-x;
         }
         .singer{
             .no-wrap;
@@ -723,9 +757,14 @@ export default {
         flex: 1;
         display: flex;
         justify-content:space-around;
+        align-items: center;
         box-sizing: border-box;
         i{
             font-size: 30px;
+            color: @color-theme;
+            &.icon-play{
+                font-size: 27px;
+            }
         }
     }
 }
@@ -747,7 +786,7 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
-    background:rgba(0, 0, 0, .7);
+    background:rgba(0, 0, 0, .9);
     animation-duration: 0.3s;
     header{
         position: absolute;

@@ -62,7 +62,9 @@ text-transform: none;
 
 .icon-favorite:before { content: "\e684"; }
 
-.icon-main:before { content: "\e67b"; }
+.icon-play2:before { content: "\e66e"; position: relative; left: 2px; }
+
+.icon-main:before { content: "\e67b";  }
 
 .icon-pause:before { content: "\e6cc"; }
 
@@ -75,4 +77,6 @@ text-transform: none;
 .icon-list:before { content: "\e603"; }
 
 .icon-more:before { content: "\e62a"; }
+
+.icon-pause2:before { content: "\e619"; }
 

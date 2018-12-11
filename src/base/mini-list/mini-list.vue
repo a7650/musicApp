@@ -2,7 +2,7 @@
     <div>
         <ul>
             <li v-for="(song,index) in playList" :key="index" @click="_selectSong(song,index)">
-                <span class="song-name" :style="c_Song(song)">{{song.name | filterCurrent(song.id,currentSong.id)}}</span>
+                <span class="song-name" :class="{'c-song':(currentSong && song.id === currentSong.id)}">{{song.name | filterCurrent(song.id,currentSong.id)}}</span>
                 <span class="singer">-{{song.singer}}</span>
                 <span class="icon">
                     <i class="icon-unfavorite"></i>
@@ -27,11 +27,6 @@ export default {
         ])
     },
     methods:{
-        c_Song(song){
-            if(this.currentSong && song.id === this.currentSong.id){
-                return {color:"#ffcd32"}
-            }
-        },
         _selectSong(song,index){
             this.$emit("selectSong",song,index);
         },
@@ -61,6 +56,9 @@ ul{
         }
         .song-name{
              max-width: 50%;
+        }
+        .c-song{
+            color:rgb(255, 60, 0);
         }
         .singer{
             padding-left: 10px;

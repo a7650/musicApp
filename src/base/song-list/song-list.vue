@@ -1,11 +1,13 @@
 <template>
     <div class="song-list">
-        <input type="text" class="search" v-model="searchText" placeholder="搜索此歌手的歌曲">
+        <div class="search">
+            <input type="text"  v-model="searchText" placeholder="搜索此歌手的歌曲">
+        </div>
         <audio ref="audio"></audio>
         <ul>
-            <li v-for="(song,index) in filterList" :key="index" @touchstart.once="audioPlay(song)" @click="_selectSong(song,index,filterList)">
+            <li v-for="(song,index) in filterList" :class="{'c-song':(currentSong && song.id === currentSong.id)}" :key="index" @touchstart.once="audioPlay(song)" @click="_selectSong(song,index,filterList)">
                 <div class="song-container">
-                    <div class="song-name" :style="c_Song(song)">{{song.name | filterCurrent(song.id,currentSong.id)}}</div>
+                    <div class="song-name" >{{song.name | filterCurrent(song.id,currentSong.id)}}</div>
                     <div class="desc">{{_getDesc(song)}}</div>
                 </div>
             </li>
@@ -15,8 +17,9 @@
 
 <script>
 import { mapGetters } from 'vuex'
-
+import {filterArray} from 'common/js/tools'
 export default {
+
     props:{
         songList:{
             type:Array
@@ -27,14 +30,19 @@ export default {
             searchText:""
         }
     },
+    computed:{
+        filterList(){
+            return filterArray(this.searchText,this.songList,"name");
+        },
+        ...mapGetters([
+            "currentSong",
+            "getPlayer",
+            "playList"
+        ])
+    },
     methods:{
         _getDesc(song){
             return `${song.singer} - ${song.album}`
-        },
-        c_Song(song){
-            if(this.currentSong && song.id === this.currentSong.id){
-                return {color:"#ffcd32"}
-            }
         },
         _selectSong(song,index,filterList){
             this.$emit("selectSong",song,index,filterList);
@@ -48,25 +56,6 @@ export default {
             }
         }
     },
-    computed:{
-        filterList(){
-            if(this.searchText.trim() == ""){
-                return this.songList
-            }
-            else{
-                return this.songList.filter(item => {
-                    return item.name.toLowerCase().indexOf(this.searchText.trim().toLowerCase()) > -1;
-                })
-            }
-        },
-        ...mapGetters([
-            "currentSong",
-            "getPlayer",
-            "playList"
-        ])
-    },
-    created(){
-    }
 }
 </script>
 
@@ -74,23 +63,36 @@ export default {
 @import "~common/stylus/variable";
 @import "~common/stylus/mixin";
 .song-list{
-    padding: 0 20px;
+    background: #fff;
 }
     .search{
         width: 100%;
-        height: 25px;
-        border-radius: 5px;
-        border: none;
-        background: rgba(0, 0, 0, .3);
-        text-align: center;
-        color: white;
-        
+        height: 45px;
+        padding: 10px 20px;
+        box-sizing: border-box;
+        input::-webkit-input-placeholder {
+            color: @color-text-d;
+            font-size: @font-size-medium-x;
+            text-align: center;
+        }
+        input{
+            width: 100%;
+            height: 100%;
+            border-radius: 2px;
+            background: rgba(0, 0, 0, .07)
+        }
     }
     ul{
         li{
             width:100%;
             position: relative;
-            border-bottom: 1px solid rgba(225, 225, 225, .1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding:  0 20px;
+            box-sizing: border-box;
+            &.c-song{
+                padding-left: 17px;
+                border-left: 3px solid #000;
+            }
         }
         .song-container{
             width: 100%;
@@ -103,8 +105,12 @@ export default {
                 .no-wrap;
                 line-height: 25px;
             }
+            .song-name{
+                color: @color-theme;
+            }
             .desc{
                 color: @color-text-d;
+                font-size: @font-size-medium;
             }
         }
     }

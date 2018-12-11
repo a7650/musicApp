@@ -1,17 +1,18 @@
 <template>
-    <div class="singer-listview" ref="singerListview">
-        <scroll class="singer-content" ref="singerContent">
-        <div>
-            <div class="search-singer">
-                <input type="text" v-model="searchText" placeholder="搜索歌手">
+    <div class="singer-listview">
+    <div class="search-singer" ref="search" :style="searchStyle">
+        <input type="text" v-model="searchText" placeholder="搜索歌手">
+    </div>
+        <scroll class="singer-content" ref="singerContent" @scroll="scroll" :listenScroll="true" :probeType="3">
+            <div>
+                <ul class="singerList">
+                    <li  v-for="(singer,index) in filterSingerList" :key="index"  @click="selectSinger(singer)">
+                        <img v-lazy="singer.pic"> <span>{{singer.name}}<i class="icon-right"></i></span>
+                    </li>
+                </ul>
             </div>
-            <ul class="singerList">
-                <li v-for="(singer,index) in filterSingerList" :key="index"  @click="selectSinger(singer)">
-                    <img v-lazy="singer.pic"> <span>{{singer.name}}</span>
-                </li>
-            </ul>
-        </div>
-        <div class="loading-container" v-if="!singerList.length"><loading></loading></div>
+            <loading v-if="!singerList.length"></loading>
+            <div class="tip" v-if="singerList.length">暂无更多</div>
         </scroll>
     </div>
 </template>
@@ -20,7 +21,7 @@
 import scroll from 'base/scroll/scroll'
 import loading from 'base/loading/loading'
 import {adaptMiniPlay} from 'common/js/mixin'
-
+import {filterArray} from 'common/js/tools'
 export default {    
     mixins:[adaptMiniPlay],
     props:{
@@ -30,7 +31,8 @@ export default {
     },
     data(){
         return {
-            searchText:""
+            searchText:"",
+            scrollY:0
         }
     },
     components:{
@@ -38,23 +40,33 @@ export default {
     },
     computed:{
         filterSingerList(){
-            if(this.searchText.trim() == ""){
-                return this.singerList;
+            return filterArray(this.searchText,this.singerList,"name");
+        },
+        searchStyle(){
+            if(this.scrollY < 0 && -this.scrollY<44){
+                return {
+                    top:this.scrollY+"px"
+                }
             }
-            let searchText = this.searchText.toLowerCase();
-            return this.singerList.filter(function(item){
-                return item.name.toLowerCase().indexOf(searchText) > -1 ;
-            })
+            else if(-this.scrollY >= 44){
+                return {
+                    position:"fixed",
+                    top:0
+                }
+            }
         }
     },
     methods:{
         adaptMiniPlay(playList){
             let bottom = playList.length>0 ? "10%" : 0;
-            this.$refs.singerListview.style.bottom = bottom;
+            this.$refs.singerContent.$el.style.bottom = bottom;
             this.$refs.singerContent.refresh();
         },
         selectSinger(singer){
             this.$emit('selectSinger',singer);
+        },
+        scroll(pos){
+            this.scrollY = pos.y;
         }
     }
     
@@ -71,30 +83,49 @@ export default {
     bottom: 0;
     width: 100%;
     .singer-content{
-        height: 100%;
-        overflow: hidden;
-        padding: 0 20px;
-    }
-    .loading-container{
         position: absolute;
-        width: 100%;
-        top: 50%;;
-        transform: translateY(-50%);
-        margin-left: -20px;
+        top: 37px;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        .tip{
+            width: 100%;
+            height: 25px;
+            font-size: @font-size-medium;
+            color: @color-text-d;
+            position: absolute;
+            text-align: center;
+            bottom: 0;
+            z-index: -99;
+        }
+       
     }
     .search-singer{
+        padding: 5px 20px;
+        background: @color-theme;
+        position: absolute;
+        top: 0;
+        box-sizing: border-box;
+        width: 100%;
+        z-index: 99;
         input{
             width: 100%;
             height: 27px;
-            background: @color-highlight-background;
-            color:gray;
+            background: @color-theme-d;
+            color:@color-text-ll;
             border-radius: 3px;
             text-align: center;
         }
+        .placeholderStyle();
     }
     .singerList{
+        padding: 0 20px;
+        background: #fff;
         li{
-            margin-top: 10px;
+            &.active{
+                background: rgba(0, 0, 0, 0.1);
+            }
+            margin-bottom: 10px;
             height: 50px;
             // background-color: @color-highlight-background;
             line-height: 50px;
@@ -107,8 +138,19 @@ export default {
                 margin-right: 15px;
             }
             span{
-                color:@color-text-l;
+                width: 100%;
+                color:@color-theme;
                 .no-wrap;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                i{
+                   font-size: @font-size-small;
+                   color: rgba(0, 0, 0, 0.5);
+                   
+                }
             }
         }
     }
