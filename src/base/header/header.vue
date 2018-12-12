@@ -2,7 +2,7 @@
         <header>
                <div class="back" @click = "back"> <i class="icon-left"></i></div>
                <div class="title">{{title}}</div>
-               <div class="more"><i :class=icon></i></div>
+               <div class="more" @click="clickMore"><i :class=icon></i></div>
         </header>
 </template>
 
@@ -12,6 +12,9 @@ export default {
     methods:{
         back(){
             this.$router.back();
+        },
+        clickMore(){
+            this.$emit("clickMore")
         }
     }
 }

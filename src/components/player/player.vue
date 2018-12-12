@@ -458,12 +458,12 @@ export default {
         position:fixed;
         width: 130%;
         height: 130%;
-        top: -50px;
-        left: -50px;
+        top: -15%;
+        left: -15%;
         background-repeat: no-repeat;
         background-size:200%;
         background-position: center;
-        filter: blur(30px);
+        filter: blur(20px);
         z-index: -99;
     }
     .bg2{

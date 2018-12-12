@@ -3,15 +3,15 @@
         <div class="rank-detail">
             <div class="bg" ref="bg" :style="bgStyle">
             </div>
-            <Header :title="title" :icon="'icon-list'"></Header>
+            <Header :title="title" :icon="'icon-list'" @clickMore="clickMore"></Header>
             <div class="bar" ref="bar">
-                <div class="play"><i class="icon-play" v-if="date"></i>{{date}}</div>
-                <div class="comment"><i class="icon-message" v-if="hot"></i>{{hot}}</div>
+                <div class="play" v-if="date"><i class="icon-play" ></i>{{date}}</div>
+                <div class="comment" v-if="hot"><i class="icon-message"></i>{{hot}}</div>
             </div>
             <div class="scroll-area">
                 <scroll class="song-content" ref="songContent" :data="songList" @scroll="scroll" :listenScroll="true" :probeType="3">
                     <songList ref="songList" :songList="songList" @selectSong="_selectSong" :rank="true"></songList>
-                    <loading v-if="!songList.length"></loading>
+                    <loading v-if="!songList.length" :loadingText="err_message"></loading>
                 </scroll>
             </div>
         </div>
@@ -20,7 +20,7 @@
 
 <script>
 import rtol from 'base/animation/right-to-left'
-import {mapGetters,mapActions} from 'vuex'
+import {mapGetters,mapActions,mapMutations} from 'vuex'
 import {getSongList,getComment} from 'api/rank'
 import {createSong,getSongVkey} from 'common/js/song'
 import {formateHot} from 'common/js/tools'
@@ -34,11 +34,12 @@ export default {
     data(){
         return {
             songList:[],
-            hot:0,
+            hot:"",
             date:"",
             day_of_year:"",
             title:"",
-            pic:""
+            pic:"",
+            err_message:"正在加载"
 
         }
     },
@@ -49,13 +50,17 @@ export default {
             }
         },
         ...mapGetters([
-            "singer"
+            "singer",
+            "rankBar"
         ])
     },
     components:{
         rtol,Header,scroll,songList,loading
     },
     methods:{
+        clickMore(){
+            this.SET_RANKBAR(true);
+        },
         adaptMiniPlay(playList){
             let bottom = playList.length>0 ? "15%" : 0;
             this.$refs.songContent.$el.style.bottom = bottom;
@@ -70,20 +75,25 @@ export default {
             }
         },
         formateDate(date){
+            if(!date)return;
             let n = date.indexOf("_");
             if(n > -1){
                 return "第"+date.slice(n+1)+"周"
             }
             return date;
         },
-         _getSongList(){
-            getSongList(this.singer.id).then( data => {
-                this.songList = this._encaseSongList(data.songlist);
+         _getSongList(id=this.singer.id){
+             getSongList(id).then( data => {
+                this.title = data.topinfo.ListName;
+                this.pic = data.topinfo.pic_v12;
                 this.hot = formateHot(data.comment_num);
                 this.date = this.formateDate(data.date);
                 this.day_of_year = data.day_of_year;
-                this.pic = data.topinfo.pic_v12;
-                this.title = data.topinfo.ListName;
+                if(data.songlist.length===0){
+                    this.err_message="这个榜单好像没有歌曲，去看看别的吧"
+                    return
+                }
+                this.songList = this._encaseSongList(data.songlist);
                 console.log("--------------------------------------------------")
                 console.log("详情信息");
                 console.log(data);
@@ -106,10 +116,9 @@ export default {
                         }
                         else{
                             var r = parseInt(item.cur_count) - parseInt(item.old_count);
-                            r = r===0?"-":r<0?"↓ "+(-r):"↑ "+r;
+                            r = r===0?"-":r<0?"↑ "+(-r):"↓ "+r;
                         }
                         result.push(createSong(item.data, "",r));
-                        
                 }
             }
             for(var j=0;j<len;j++){
@@ -127,13 +136,23 @@ export default {
                 index
             })
         },
+        ...mapMutations([
+            "SET_RANKBAR"
+        ]),
         ...mapActions([
             "selectSong"
         ])
     },
+    watch:{
+        '$route'(to,from){
+            this.err_message="正在加载"
+            this.songList=[];
+            this._getSongList(to.params.topid);
+        }
+    },
     created(){
         this._getSongList();
-        getComment(this.singer.id,1,25);
+        // getComment(this.singer.id,1,25);
     },
     mounted(){
         this.bgHeight = this.$refs.bg.clientHeight;

@@ -2,7 +2,7 @@
     <div class="rank" ref="rank">
         <scroll :data="topList" class="list-content" ref="listContent">
         <ul class="top-list">
-            <li v-for="item in topList" :key="item.id" @click="selectList(item)">
+            <li v-for="(item,index) in topList" :key="index" @click="selectList(item,index)">
                 <div class="list-icon">
                     <img v-lazy="item.picUrl">
                 </div>
@@ -19,6 +19,21 @@
         <loading v-if="!topList.length"></loading>
         </scroll>
         <router-view></router-view>
+        <transition name="sidebar">
+        <div class="side-bar" v-if="rankBar">
+            <div class="bg" @click="closeBar"></div>
+            <div class="bar">
+                <header>切换榜单</header>
+                <scroll :data="topList" class="list-content">
+                <ul>
+                    <li v-for="(item,index) in topList" :key="index" :class="{'c-list':currentList===index}" @click="selectList2(item,index)">
+                        {{item.topTitle | titleFilter}}
+                    </li>
+                </ul>
+                </scroll>
+            </div>
+        </div>
+        </transition>
     </div>
 </template>
 
@@ -27,19 +42,33 @@ import {getRankList} from 'api/rank'
 import scroll from 'base/scroll/scroll'
 import loading from 'base/loading/loading'
 import {adaptMiniPlay} from 'common/js/mixin'
-import {mapMutations} from 'vuex'
+import {mapMutations,mapGetters} from 'vuex'
 export default {
     mixins:[adaptMiniPlay],
     data(){
         return{
-            topList:[]
+            topList:[],
+            currentList:-1
         }
+    },
+    computed:{
+        ...mapGetters([
+            "rankBar"
+        ])
     },
     components:{
         scroll,
         loading
     },
+    filters:{
+        titleFilter(val){
+            return val.replace("巅峰榜·","");
+        }
+    },
     methods:{
+        closeBar(){
+            this.SET_RANKBAR(false);
+        },
         adaptMiniPlay(playList){
             let bottom = playList.length>0 ? "10%" : 0;
             this.$refs.rank.style.bottom = bottom;
@@ -53,7 +82,8 @@ export default {
                 console.log(err);
             })
         },
-        selectList(item){
+        selectList(item,index){
+            this.currentList = index;
             this.$router.push({
                     name:"rankDetail",
                     params:{
@@ -62,8 +92,20 @@ export default {
                 });
             this.SET_SINGER(item);
         },
+        selectList2(item,index){
+            this.currentList = index;
+            this.$router.replace({
+                    name:"rankDetail",
+                    params:{
+                        topid:item.id
+                    }
+                });
+            this.SET_SINGER(item);
+            this.SET_RANKBAR(false);
+        },
         ...mapMutations([
-            "SET_SINGER"
+            "SET_SINGER",
+            "SET_RANKBAR"
         ])
     },
     created(){
@@ -138,8 +180,63 @@ export default {
         }
     }
 }
-
-
+.side-bar{
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 99;
+    .bg{
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, .2);
+    }
+    .bar{
+        position: absolute;
+        width: 150px;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        background: #fff;
+        box-shadow: -5px 0 10px rgba(0, 0, 0, .2);
+        z-index: 99;
+        header{
+            width: 100%;
+            height: 40px;
+            color: #000;
+            font-weight: bold;
+            font-size: @font-size-large;
+            line-height: 40px;
+            text-align:center;
+        }
+        .list-content{
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 40px;
+            bottom: 50px;
+            overflow: hidden;
+        }
+        li{
+            color: #000;
+            width: 100%;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+        }
+        .c-list{
+            background: rgba(0, 0, 0, .15);
+        }
+    }
+}
+.sidebar-enter,.sidebar-leave-to{
+    right: -150px;
+    opacity: 0;
+}
+.sidebar-enter-active,.sidebar-leave-active{
+    transition: .3s;
+}
 
 </style>
 

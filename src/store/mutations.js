@@ -1,4 +1,5 @@
 import * as types from './mutation-types'
+import { type } from 'os';
 
 const mutations = {
     [types.SET_SINGER](state,singer){
@@ -43,6 +44,10 @@ const mutations = {
 
     [types.SET_PLAYER](state,obj){
         state.player = obj;
+    },
+
+    [types.SET_RANKBAR](state,flag){
+        state.rankBar = flag;
     }
 
     
