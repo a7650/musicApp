@@ -1,34 +1,46 @@
 <template>
     <div class="song-list">
-        <div class="search">
-            <input type="text"  v-model="searchText" placeholder="搜索此歌手的歌曲">
+        <div v-if="search" class="search">
+            <input  type="text"  v-model="searchText" placeholder="搜索此歌手的歌曲">
         </div>
-        <audio ref="audio"></audio>
         <ul>
-            <li v-for="(song,index) in filterList" :class="{'c-song':(currentSong && song.id === currentSong.id)}" :key="index" @touchstart.once="audioPlay(song)" @click="_selectSong(song,index,filterList)">
+            <li v-for="(song,index) in filterList" :class="{'c-song':(currentSong && song.id === currentSong.id),'noUrl':!song.url}" :key="index" @touchstart.once="audioPlay(song)" @click="_selectSong(song,index,filterList)">
                 <div class="song-container">
-                    <div class="song-name" >{{song.name | filterCurrent(song.id,currentSong.id)}}</div>
+                    <div class="song-name" >{{song.name | filterCurrent(song.id,currentSong.id,song.url)}}</div>
                     <div class="desc">{{_getDesc(song)}}</div>
                 </div>
             </li>
         </ul>
+        <div class="loading" v-show="loading"><loading loadingText=""></loading></div>
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import {filterArray} from 'common/js/tools'
+import loading from 'base/loading/loading'
 export default {
 
     props:{
         songList:{
             type:Array
+        },
+        search:{
+            type:Boolean,
+            default:true
+        },
+        loading:{
+            type:Boolean,
+            default:false
         }
     },
     data(){
         return{
             searchText:""
         }
+    },
+    components:{
+        loading
     },
     computed:{
         filterList(){
@@ -64,6 +76,11 @@ export default {
 @import "~common/stylus/mixin";
 .song-list{
     background: #fff;
+    .loading{
+        width: 100%;
+        height: 30px;
+        position: relative;
+    }
 }
     .search{
         width: 100%;
@@ -111,6 +128,11 @@ export default {
             .desc{
                 color: @color-text-d;
                 font-size: @font-size-medium;
+            }
+        }
+        .noUrl{
+            .song-name,.desc{
+                color: rgba(0, 0, 0, 0.3);
             }
         }
     }

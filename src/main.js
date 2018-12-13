@@ -16,7 +16,10 @@ Vue.use(lazyload,{
   attempt:3
 })
 
-Vue.filter("filterCurrent",(val,id1,id2) => {
+Vue.filter("filterCurrent",(val,id1,id2,url) => {
+  if(!url){
+    return `${val}(暂无音源)`
+  }
   if(id1 === id2){
       return `${val}(正在播放)`
   }

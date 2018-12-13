@@ -125,7 +125,7 @@ export default {
                 let item = result[j];
                 getSongVkey(item.mid).then((res) => {
                     let vkey = res.data.items[0].vkey;
-                    item.url += vkey;
+                    item.url =`http://dl.stream.qqmusic.qq.com/C400${item.mid}.m4a?fromtag=38&guid=5931742855&vkey=${vkey}`
                 })
             }
             return result;

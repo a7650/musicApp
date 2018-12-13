@@ -39,7 +39,7 @@
 import musicList from 'components/music-list/music-list'
 import {mapGetters} from 'vuex'
 import {getDiscSongList} from 'api/recommend'
-import {createSong,getSongVkey} from 'common/js/song'
+import {_encaseSongList} from 'common/js/song'
 import rtol from 'base/animation/right-to-left'
 import scroll from 'base/scroll/scroll'
 import discSonglist from 'base/disc-songlist/disc-songlist'
@@ -93,25 +93,13 @@ export default {
         
         _getDiscSongList(){
             getDiscSongList(this.singer.dissid).then( data => {
-                this.songList = this._encaseSongList(data.songlist);
+                this.songList = _encaseSongList(data.songlist);
                 this.desc[0] = data.desc;
                 this.dissname = data.dissname;
                 this.title = data.nickname;
                 this.tags = data.tags;
                 this.hot = formateHot(data.visitnum);
             })
-        },
-        _encaseSongList(list){
-            let result = [];
-            list.forEach(item => {
-                getSongVkey(item.songmid).then((res) => {
-                    const vkey = res.data.items[0].vkey;
-                    if (item.songid && item.albummid) {
-                        result.push(createSong(item, vkey))
-                    }
-                })
-            })
-            return result;
         },
         randomPlay(){
             let randomList = shuffle(this.songList);

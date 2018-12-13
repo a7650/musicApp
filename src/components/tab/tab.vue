@@ -10,7 +10,7 @@
       <span class="tab-link">排行
       </span>
     </router-link>
-    <router-link tag="div" class="tab-item" to="/search">
+    <router-link tag="div" class="tab-item" to="/mine">
       <span class="tab-link">我的</span>
     </router-link>
     </div>

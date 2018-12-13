@@ -7,7 +7,7 @@
             <div>
                 <ul class="singerList">
                     <li  v-for="(singer,index) in filterSingerList" :key="index"  @click="selectSinger(singer)">
-                        <img v-lazy="singer.pic"> <span>{{singer.name}}<i class="icon-right"></i></span>
+                        <img :src="singer.pic"> <span>{{singer.name}}<i class="icon-right"></i></span>
                     </li>
                 </ul>
             </div>

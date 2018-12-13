@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import rank from 'components/rank/rank'
 import singer from 'components/singer/singer'
 import recommend from 'components/recommend/recommend'
-import search from 'components/search/search'
+import mine from 'components/mine/mine'
 import singerDetail from 'components/singer-detail/singer-detail'
 import discDetail from 'components/disc-detail/disc-detail'
 import rankDetail from 'components/rank-detail/rank-detail'
@@ -14,45 +14,45 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect:'/recommend'
+      redirect: '/recommend'
     },
     {
-      path:'/rank',
-      component:rank,
-      children:[
+      path: '/rank',
+      component: rank,
+      children: [
         {
-          name:"rankDetail",
-          path:":topid",
-          component:rankDetail
+          name: "rankDetail",
+          path: ":topid",
+          component: rankDetail
         }
       ]
     },
     {
-      path:'/singer',
-      component:singer,
-      children:[
+      path: '/singer',
+      component: singer,
+      children: [
         {
-          name:'singerDetail',
-          path:':id',
-          component:singerDetail
+          name: 'singerDetail',
+          path: ':id',
+          component: singerDetail
         }
       ]
     },
     {
-      path:'/search',
-      component:search
+      path: '/mine',
+      component: mine
     },
     {
-      path:'/recommend',
-      component:recommend,
-      children:[
+      path: '/recommend',
+      component: recommend,
+      children: [
         {
-          name:'discDetail',
-          path:':id',
-          component:discDetail
+          name: 'discDetail',
+          path: ':id',
+          component: discDetail
         }
       ]
     }
-    
+
   ]
 })

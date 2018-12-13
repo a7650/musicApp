@@ -50,7 +50,7 @@ export function createSong(musicData,vkey,r){
         album: musicData.albumname,
         duration: musicData.interval,
         image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${musicData.albummid}.jpg?max_age=2592000`,
-        url:`http://dl.stream.qqmusic.qq.com/C400${musicData.songmid}.m4a?fromtag=38&guid=5931742855&vkey=${vkey}`,
+        url:vkey?`http://dl.stream.qqmusic.qq.com/C400${musicData.songmid}.m4a?fromtag=38&guid=5931742855&vkey=${vkey}`:"",
         rank:r
     })
 }
@@ -83,4 +83,31 @@ export function getSongVkey(songmid) {
         filename: `C400${songmid}.m4a`
     })
     return jsonp(url, data)
+}
+
+
+export function _encaseSongList(list,data){
+    let result=[];
+    list.forEach((item) => {
+        let ITEM = item;
+        if(data){
+             ITEM = item[data]
+        }
+        if (ITEM.songid && ITEM.songmid){
+            result.push(createSong(ITEM, ""))
+            // getSongVkey(ITEM.songmid).then((res) => {
+            //     const vkey = res.data.items[0].vkey;
+            //     result.push(createSong(ITEM, vkey))
+            // })
+        }
+    })
+    result.forEach((item)=>{
+            getSongVkey(item.mid).then((res) => {
+                let vkey = res.data.items[0].vkey;
+                item.url =vkey?`http://dl.stream.qqmusic.qq.com/C400${item.mid}.m4a?fromtag=38&guid=5931742855&vkey=${vkey}`:"";
+            })
+    })
+    // result.length=list.length;
+    // console.log(result.length);
+    return result;
 }
