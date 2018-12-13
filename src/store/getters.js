@@ -16,6 +16,8 @@ export const currentIndex = state => state.currentIndex
 
 export const currentSong = state => {return state.playList[state.currentIndex] || {}}
 
-export const getPlayer = state => {return state.player}
+export const getPlayer = state =>  state.player
 
-export const rankBar = state => {return state.rankBar}
+export const rankBar = state =>  state.rankBar
+
+export const searchHistory = state => state.searchHistory

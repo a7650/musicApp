@@ -11,6 +11,7 @@
     "animate.css": "^3.7.0",
     "better-scroll": "^1.13.2",
     "express": "^4.16.4",
+    "good-storage": "^1.1.0",
     "js-base64": "^2.4.9",
     "jsonp": "^0.2.1",
     "lazy-load": "0.0.2",

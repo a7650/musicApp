@@ -7,9 +7,9 @@
         <div class="back">点击此处返回</div>
       </div>
       <div class="search-detail">
-        <transition name="hot">
-          <div class="hot" v-show="!searchText">
-            <span>热门搜索</span>
+        <transition-group name="hot">
+          <div class="hot" v-show="!searchText" :key="1">
+            <header>热门搜索</header>
             <div class="key">
               <span
                 @click="selectHotKey(item.k)"
@@ -18,7 +18,18 @@
               >{{item.k}}</span>
             </div>
           </div>
-        </transition>
+          <div class="search-history" v-show="!searchText" :key="2">
+              <header>
+                  <span class="title">搜索历史</span>
+                  <span class="clear" @click="clearHistory(true)">清除记录</span>
+              </header>
+              <ul>
+                  <li v-for="(val,index) in searchHistory" :key="index"  @click="selectHotKey(val)">
+                      <span>{{val}}</span><i @click.stop="clearHistory(false,index)" class="icon-false"></i>
+                  </li>
+              </ul>
+          </div>
+        </transition-group>
         <scroll
           class="song-content"
           :data="searchList"
@@ -41,7 +52,7 @@
           <loading v-show="!searchList.length" :loadingText="loadingText"></loading>
         </scroll>
       </div>
-      <alert v-if="alert" :message="alertMessage" @alertButton="alertButton"></alert>
+      <alert v-if="alert" :message="alertMessage" @alertButton="alertButton" :button="button"></alert>
     </div>
   </transition>
   
@@ -75,7 +86,8 @@ export default {
       pullUp: true,
       tip: true,
       tipMessage: "",
-      loadingText: ""
+      loadingText: "",
+      button:["确认"]
     };
   },
   computed: {
@@ -83,7 +95,8 @@ export default {
       return this.totalNum - this.nowNum;
     },
     ...mapGetters([
-        "playList"
+        "playList",
+        "searchHistory"
     ])
 
   },
@@ -97,9 +110,6 @@ export default {
     scrollToEnd() {
       this.searchMore();
     },
-    alertButton(index) {
-      this.alert = false;
-    },
     adaptMiniPlay(playList) {
       let bottom = playList.length > 0 ? "10%" : 0;
       this.$refs.songContent.$el.style.bottom = bottom;
@@ -110,11 +120,39 @@ export default {
     },
     _getHotKey() {
       getHotKey().then(data => {
-        this.hotKey = data.data.hotkey.splice(0, 10);
+        this.hotKey = data.data.hotkey.splice(0, 6);
       });
+    },
+    _alert(message,button){
+      this.button = ["确定"];
+      if(button){
+        this.button = button;
+      }
+      this.alertMessage = message;
+      this.alert = true;
+    },
+    alertButton(index) {
+      switch (index){
+        case 0 : this.alert = false;break;
+        case 1 : this.CLEAR_SEARCHHISTORY({flag:true}),this.alert=false;break;
+        default : this.alert = false;
+      }
+    },
+    clearHistory(flag,index){
+      if(!this.searchHistory.length){
+        this._alert("这里没有历史纪录");
+        return;
+      }
+      if(flag){
+        this._alert("你将清空所有历史记录",["取消","确定"]);
+      }
+      else{
+        this.CLEAR_SEARCHHISTORY({flag:false,index});
+      }
     },
     selectHotKey(k) {
       this.$emit("selectHotKey", k);
+      this.SAVE_SEARCHHISTORY(k);
     },
     _selectZhida(zhida){
         let singer = {
@@ -124,11 +162,12 @@ export default {
             pic:`https://y.gtimg.cn/music/photo_new/T001R300x300M000${zhida.singermid}.jpg?max_age=2592000`
         };
         this.$emit("_selectZhida",singer);
+        this.SAVE_SEARCHHISTORY(this.searchText);
     },
     _selectSong(song, index) {
+        this.SAVE_SEARCHHISTORY(this.searchText);
       if (song.url === "") {
-        this.alertMessage = "这首歌没有音源,版权方要钱，听听别的吧😁";
-        this.alert = true;
+        this._alert("这首歌没有音源,版权方要钱，听听别的吧😁");
         return;
       }
       if(!this.playList.length){
@@ -159,7 +198,7 @@ export default {
       });
     },
     ...mapActions(["selectSong","selectSearchSong"]),
-    ...mapMutations(["SET_SINGER"])
+    ...mapMutations(["SET_SINGER","SAVE_SEARCHHISTORY","CLEAR_SEARCHHISTORY"])
   },
   watch: {
     searchText(val) {
@@ -249,6 +288,9 @@ export default {
     padding: 10px 20px;
     box-sizing: border-box;
     .hot {
+        header{
+            color: @color-text-d;
+        }
       .key {
         span {
           display: inline-block;
@@ -260,6 +302,43 @@ export default {
           border-radius: 12px;
         }
       }
+    }
+    .search-history{
+        margin-top: 10px;
+        header{
+            width: 100%;
+            height: 30px;
+            line-height: 30px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            span{
+                color: @color-text-d;
+            }
+            .title{
+                float: left;
+            }
+            .clear{
+                float: right;
+            }
+        }
+        li{
+            width: 100%;
+            height: 40px;
+            line-height: 40px;
+            box-sizing: border-box;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            span{
+                float: left;
+            }
+            i{
+                display: inline-block;
+                width: 40px;
+                height: 40px;
+                line-height: 40px;
+                float: right;
+                text-align: right;
+            }
+             
+        }
     }
     .song-content {
       position: absolute;

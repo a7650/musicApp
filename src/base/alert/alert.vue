@@ -1,5 +1,4 @@
 <template>
-<transition>
     <div class="alert" >
         <div class="message">
             <p>{{message}}</p>
@@ -10,7 +9,6 @@
             </span>
         </div>
     </div>
-</transition>
 </template>
 
 <script>
@@ -40,7 +38,7 @@ export default {
 @import "~common/stylus/variable";
 @import "~common/stylus/mixin";
 .alert{
-    animation-duration: .3s;
+    // animation-duration: .3s;
     width: 240px;
     height: 120px;
     background: #fff;
@@ -72,10 +70,14 @@ export default {
         bottom: 0;
         span{
             flex: 1;
-            height: 30px;
-            line-height: 30px;
+            height: 35px;
+            line-height: 35px;
             text-align: center;
+            &:nth-child(2){
+                border-left: 1px solid rgba(0, 0, 0, .2);
+            }
         }
+        
     }
 }
 </style>

@@ -1,6 +1,5 @@
 import * as types from './mutation-types'
-import { type } from 'os';
-import { currentIndex } from './getters';
+import {saveSearchHistory,clearSearchHistory} from 'common/js/cache'
 
 const mutations = {
     [types.SET_SINGER](state,singer){
@@ -57,7 +56,6 @@ const mutations = {
             if(item.id===song.id){
                 n=index;
             }
-         
         })
         if(n>-1){
             state.currentIndex = n;
@@ -70,9 +68,14 @@ const mutations = {
             }
             state.currentIndex++;
         }
-        
-       
+    },
 
+    [types.SAVE_SEARCHHISTORY](state,val){
+        state.searchHistory = saveSearchHistory(val);
+    },
+
+    [types.CLEAR_SEARCHHISTORY](state,payload){
+        state.searchHistory = clearSearchHistory(payload);
     }
 
 
