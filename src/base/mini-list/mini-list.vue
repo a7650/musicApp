@@ -2,8 +2,8 @@
     <div>
         <ul>
             <li v-for="(song,index) in playList" :key="index" @click="_selectSong(song,index)">
-                <span class="song-name" :class="{'c-song':(currentSong && song.id === currentSong.id)}">{{song.name | filterCurrent(song.id,currentSong.id,song.url)}}</span>
-                <span class="singer">-{{song.singer}}</span>
+                <span class="song-name" :class="{'c-song':(currentSong && song.id === currentSong.id)}" v-html="filterSong(song.name,song.id,currentSong.id,song.url)"></span>
+                <span class="singer" v-html="'-'+song.singer"></span>
                 <span class="icon">
                     <i class="icon-unfavorite"></i>
                     <i class="icon-false" @click.stop="deleteSong(index)"></i>
@@ -32,6 +32,17 @@ export default {
         },
         deleteSong(index){
             this.$emit("deleteSong",index);
+        },
+        filterSong(val,id1,id2,url){
+            if(!url){
+                return `${val}(暂无音源)`
+            }
+            if(id1 === id2){
+                return `${val}(正在播放)`
+            }
+            else{
+                return val;
+            }
         }
     }
 }

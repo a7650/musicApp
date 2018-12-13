@@ -20,3 +20,5 @@ export const SET_PLAYER = "SET_PLAYER"
 
 export const SET_RANKBAR = "SET_RANKBAR"
 
+export const ADD_SONG = "ADD_SONG"
+

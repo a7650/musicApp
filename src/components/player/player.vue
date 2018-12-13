@@ -13,10 +13,10 @@
           <div class="more">
             <i class="icon-more"></i>
           </div>
-          <div class="song-name">{{currentSong.name}}</div>
+          <div class="song-name" v-html="currentSong.name"></div>
           <div class="singer-name">
             <span class="line left-line"></span>
-            <span class="name">{{currentSong.singer}}</span>
+            <span class="name" v-html="currentSong.singer"></span>
             <span class="line right-line"></span>
           </div>
         </header>
@@ -95,8 +95,8 @@
         </div>
       </div>
       <div class="song-desc">
-        <span class="name">{{currentSong.name}}</span>
-        <span class="singer">{{currentSong.singer}}</span>
+        <span class="name" v-html="currentSong.name"></span>
+        <span class="singer" v-html="currentSong.singer"></span>
       </div>
       <div class="icon">
         <i :class="miniPlayingIcon" @click.stop="togglePlaying"></i>
@@ -308,6 +308,12 @@ export default {
             return;
           }
           this.currentLyric = new Lyric(lyric, this.handleLyric);
+          if(!this.currentLyric.lines.length){
+            this.currentLyric.stop();
+            this.currentLyric = null;
+            this.noLyric = true;
+            return;
+          }
           if (this.readyPlay) {
             this.currentLyric.play();
             this.currentLyric.seek(this.nowTime * 1000);

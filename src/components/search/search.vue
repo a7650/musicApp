@@ -52,7 +52,7 @@ import { getHotKey, search } from "api/search";
 import songList from "base/song-list/song-list";
 import { _encaseSongList } from "common/js/song";
 import scroll from "base/scroll/scroll";
-import { mapActions } from "vuex";
+import { mapActions,mapGetters } from "vuex";
 import { adaptMiniPlay } from "common/js/mixin";
 import loading from "base/loading/loading";
 import alert from "base/alert/alert";
@@ -81,7 +81,11 @@ export default {
   computed: {
     otherNum() {
       return this.totalNum - this.nowNum;
-    }
+    },
+    ...mapGetters([
+        "playList"
+    ])
+
   },
   components: {
     songList,
@@ -127,10 +131,15 @@ export default {
         this.alert = true;
         return;
       }
-      this.selectSong({
-        list: [song],
-        index: 0
-      });
+      if(!this.playList.length){
+          this.selectSong({
+            list: [song],
+            index: 0
+          })
+          return
+      }
+      this.selectSearchSong(song);
+
     },
     searchMore() {
       if (this.otherNum <= 0) {
@@ -149,7 +158,7 @@ export default {
         this.nowNum += n;
       });
     },
-    ...mapActions(["selectSong"]),
+    ...mapActions(["selectSong","selectSearchSong"]),
     ...mapMutations(["SET_SINGER"])
   },
   watch: {
@@ -175,7 +184,7 @@ export default {
           console.log(data);
           let song = data.data.song;
           if (data.code !== 0 || !song.list.length) {
-            this.tipMessage = `搜索不到${this.searchText},换个试试吧`;
+            this.loadingText = this.tipMessage = `搜索不到《${this.searchText}》,换个试试吧`;
             return;
           }
           this.tip = false;

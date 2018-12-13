@@ -11,3 +11,7 @@ import * as types from './mutation-types'
  export const deleteSong = ({commit},index) => {
     commit(types.DELETE_PLAYLIST,index)
  }
+
+ export const selectSearchSong = ({commit,state},song) => {
+   var r = commit(types.ADD_SONG,song)
+ }

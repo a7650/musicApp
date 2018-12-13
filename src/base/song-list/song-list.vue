@@ -14,8 +14,8 @@
         <ul>
             <li v-for="(song,index) in filterList" :class="{'c-song':(currentSong && song.id === currentSong.id),'noUrl':!song.url}" :key="index" @touchstart.once="audioPlay(song)" @click="_selectSong(song,index,filterList)">
                 <div class="song-container">
-                    <div class="song-name" >{{song.name | filterCurrent(song.id,currentSong.id,song.url)}}</div>
-                    <div class="desc">{{_getDesc(song)}}</div>
+                    <div class="song-name"  v-html="filterSong(song.name,song.id,currentSong.id,song.url)"></div>
+                    <div class="desc" v-html="_getDesc(song)"></div>
                 </div>
             </li>
         </ul>
@@ -81,6 +81,17 @@ export default {
         },
         selectZhida(){
             this.$emit("selectZhida",this.zhida);
+        },
+        filterSong(val,id1,id2,url){
+            if(!url){
+                return `${val}(暂无音源)`
+            }
+            if(id1 === id2){
+                return `${val}(正在播放)`
+            }
+            else{
+                return val;
+            }
         }
     },
 }
