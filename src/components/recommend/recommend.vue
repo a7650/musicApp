@@ -202,7 +202,7 @@ export default {
       color: @color-text-d;
       &.l {
         margin-right: -27px;
-        z-index: 99;
+        // z-index: 99;
         position: relative;
       }
       &.r {

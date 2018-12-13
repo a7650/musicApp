@@ -479,16 +479,16 @@ export default {
   right: 0;
   display: flex;
   flex-direction: column;
-  background-color: #fff;
+  background-color: rgb(109, 109, 109);
   animation-duration: 0.3s;
   .bg {
     position: fixed;
-    width: 130%;
-    height: 130%;
-    top: -15%;
-    left: -15%;
+    width: 100%;
+    height: 100%;
+    // top: -15%;
+    // left: -15%;
     background-repeat: no-repeat;
-    background-size: 200%;
+    background-size: cover;
     background-position: center;
     filter: blur(20px);
     z-index: -99;
