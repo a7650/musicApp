@@ -15,6 +15,7 @@
         v-show="searchShow"
         @closeSearch="searchShow=false;clearSearchText()"
         @selectHotKey="selectHotKey"
+        @_selectZhida="selectZhida"
       ></search>
     </div>
     <div v-if="recommends.length" class="slider-wrapper">
@@ -105,9 +106,18 @@ export default {
     selectHotKey(k) {
       this.searchText = k;
     },
+    selectZhida(singer) {
+      this.$router.push({
+        name: "zhidaDetail",
+        params: {
+          id: singer.id
+        }
+      });
+      this.SET_SINGER(singer);
+    },
     clearSearchText() {
       this.searchText = "";
-      if(this.searchShow){
+      if (this.searchShow) {
         this.$refs.search.focus();
       }
     },

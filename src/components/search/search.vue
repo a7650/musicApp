@@ -2,159 +2,193 @@
   <transition name="search-content">
     <div class="search-content">
       <div class="bg" @click="closeSearch">
-          <div class="tip" v-show="searchList.length">
-              共为您找到{{totalNum}}首歌{{"    "+nowNum+"/"+totalNum}}
-          </div>
-          <div class="tip" v-show="tip" v-html="tipMessage">
-                
-          </div>
-          <div class="back">点击此处返回</div>
+        <div class="tip" v-show="searchList.length">共为您找到{{totalNum}}首歌{{" "+nowNum+"/"+totalNum}}</div>
+        <div class="tip" v-show="tip" v-html="tipMessage"></div>
+        <div class="back">点击此处返回</div>
       </div>
       <div class="search-detail">
         <transition name="hot">
-        <div class="hot" v-show="!searchText">
-          <span>热门搜索</span>
-          <div class="key">
-              <span @click="selectHotKey(item.k)" v-for="(item,index) in hotKey" :key="index">{{item.k}}</span>
-          </div>
-        </div>
-        </transition>
-        <scroll class="song-content" :data="searchList" :pullUp="pullUp" @scrollToEnd="scrollToEnd" v-show="searchText" ref="songContent">
-            <div>
-            <songList :loading="loading" v-show="searchList.length>0"  :songList="searchList" :search="false" @selectSong="_selectSong"></songList>
+          <div class="hot" v-show="!searchText">
+            <span>热门搜索</span>
+            <div class="key">
+              <span
+                @click="selectHotKey(item.k)"
+                v-for="(item,index) in hotKey"
+                :key="index"
+              >{{item.k}}</span>
             </div>
-            <loading v-show="!searchList.length" :loadingText="loadingText"></loading>
+          </div>
+        </transition>
+        <scroll
+          class="song-content"
+          :data="searchList"
+          :pullUp="pullUp"
+          @scrollToEnd="scrollToEnd"
+          v-show="searchText"
+          ref="songContent"
+        >
+          <div>
+            <songList
+              :zhida="zhida"
+              :loading="loading"
+              v-show="searchList.length>0"
+              :songList="searchList"
+              :search="false"
+              @selectSong="_selectSong"
+              @selectZhida="_selectZhida"
+            ></songList>
+          </div>
+          <loading v-show="!searchList.length" :loadingText="loadingText"></loading>
         </scroll>
       </div>
       <alert v-if="alert" :message="alertMessage" @alertButton="alertButton"></alert>
     </div>
   </transition>
+  
 </template>
 
 <script>
-import { getHotKey,search} from "api/search"
-import songList from 'base/song-list/song-list'
-import {_encaseSongList} from 'common/js/song'
-import scroll from 'base/scroll/scroll'
-import {mapActions} from 'vuex'
-import {adaptMiniPlay} from 'common/js/mixin'
-import loading from 'base/loading/loading'
-import alert from 'base/alert/alert'
+import { getHotKey, search } from "api/search";
+import songList from "base/song-list/song-list";
+import { _encaseSongList } from "common/js/song";
+import scroll from "base/scroll/scroll";
+import { mapActions } from "vuex";
+import { adaptMiniPlay } from "common/js/mixin";
+import loading from "base/loading/loading";
+import alert from "base/alert/alert";
+import {mapMutations} from 'vuex'
 const prePage = 20;
 export default {
-  mixins:[adaptMiniPlay],
+  mixins: [adaptMiniPlay],
   props: ["searchText"],
   data() {
     return {
-        hotKey:[],
-        page:1,
-        searchList:[],
-        alert:false,
-        alertMessage:"",
-        totalNum:0,
-        nowNum:0,
-        loading:false,
-        pullUp:true,
-        tip:true,
-        tipMessage:"",
-        loadingText:""
+      zhida: null,
+      hotKey: [],
+      page: 1,
+      searchList: [],
+      alert: false,
+      alertMessage: "",
+      totalNum: 0,
+      nowNum: 0,
+      loading: false,
+      pullUp: true,
+      tip: true,
+      tipMessage: "",
+      loadingText: ""
     };
   },
   computed: {
-      otherNum(){
-          return this.totalNum-this.nowNum;
-      }
+    otherNum() {
+      return this.totalNum - this.nowNum;
+    }
   },
-  components:{
-      songList,scroll,loading,alert
+  components: {
+    songList,
+    scroll,
+    loading,
+    alert
   },
   methods: {
-    scrollToEnd(){
-        this.searchMore();
+    scrollToEnd() {
+      this.searchMore();
     },
-    alertButton(index){
-        this.alert = false;
+    alertButton(index) {
+      this.alert = false;
     },
-    adaptMiniPlay(playList){
-        let bottom = playList.length>0 ? "10%" : 0;
-        this.$refs.songContent.$el.style.bottom = bottom;
-        this.$refs.songContent.refresh();
+    adaptMiniPlay(playList) {
+      let bottom = playList.length > 0 ? "10%" : 0;
+      this.$refs.songContent.$el.style.bottom = bottom;
+      this.$refs.songContent.refresh();
     },
     closeSearch() {
       this.$emit("closeSearch");
     },
-    _getHotKey(){
-        getHotKey().then(data => {
-            this.hotKey = data.data.hotkey.splice(0,10);
-        })
+    _getHotKey() {
+      getHotKey().then(data => {
+        this.hotKey = data.data.hotkey.splice(0, 10);
+      });
     },
-    selectHotKey(k){
-       this.$emit("selectHotKey",k);
+    selectHotKey(k) {
+      this.$emit("selectHotKey", k);
     },
-    _selectSong(song,index){
-        if(song.url===""){
-            this.alertMessage = "这首歌没有音源,版权方要钱，听听别的吧😁";
-            this.alert = true;
-            return;
-        }
-        this.selectSong({
-            list:[song],
-            index:0
-        })
+    _selectZhida(zhida){
+        let singer = {
+            id:zhida.singerid,
+            mid:zhida.singermid,
+            name:zhida.singername,
+            pic:`https://y.gtimg.cn/music/photo_new/T001R300x300M000${zhida.singermid}.jpg?max_age=2592000`
+        };
+        this.$emit("_selectZhida",singer);
     },
-    searchMore(){
-        if(this.otherNum<=0){
-            this.loading = false;
-            return
-        }
-        this.loading =true;
-        var n = prePage;
-        this.page++;
-        if(this.otherNum<20){
-             n = this.otherNum;
-        }
-        search(this.searchText,this.page,n).then(data => {
-            let newList =  _encaseSongList(data.data.song.list);
-            this.searchList=this.searchList.concat(newList);
-            this.nowNum+=n;
-        })
-
+    _selectSong(song, index) {
+      if (song.url === "") {
+        this.alertMessage = "这首歌没有音源,版权方要钱，听听别的吧😁";
+        this.alert = true;
+        return;
+      }
+      this.selectSong({
+        list: [song],
+        index: 0
+      });
     },
-    ...mapActions([
-        "selectSong"
-    ])
+    searchMore() {
+      if (this.otherNum <= 0) {
+        this.loading = false;
+        return;
+      }
+      this.loading = true;
+      var n = prePage;
+      this.page++;
+      if (this.otherNum < 20) {
+        n = this.otherNum;
+      }
+      search(this.searchText, this.page, n).then(data => {
+        let newList = _encaseSongList(data.data.song.list);
+        this.searchList = this.searchList.concat(newList);
+        this.nowNum += n;
+      });
+    },
+    ...mapActions(["selectSong"]),
+    ...mapMutations(["SET_SINGER"])
   },
   watch: {
-      searchText(val){
-          if(this.timer){
-              clearTimeout(this.timer);
-          }
-          this.totalNum = this.nowNum = 0;
-          this.searchList=[];
-          this.tipMessage = this.loadingText = "在停止输入0.5s后会自动搜索";
-          this.tip = true;
-          if(val===""){
-              return;
-          };
-          this.page = 1;
-          this.timer = setTimeout(() => {
-              this.tipMessage = `<i class='icon-search'></i> 正在为您搜索《${this.searchText}》`;
-              this.loadingText = "正在搜索";
-              search(this.searchText,this.page,prePage).then(data => {
-                  console.log(data);
-                  let song = data.data.song;
-                  if(data.code !== 0  || !song.list.length){
-                      this.tipMessage = `搜索不到${this.searchText},换个试试吧`;
-                      return;
-                  }
-                  this.tip = false;
-                  this.searchList = _encaseSongList(song.list);
-                  this.totalNum = parseInt(song.totalnum);
-                  this.nowNum = prePage>=this.totalNum?this.totalNum:prePage;
-                  this.loading = prePage>=this.totalNum?false:true;
-              })
-          }, 500);
+    searchText(val) {
+      if (this.timer) {
+        clearTimeout(this.timer);
       }
+      this.totalNum = this.nowNum = 0;
+      this.searchList = [];
+      this.tipMessage = this.loadingText = "在停止输入0.5s后会自动搜索";
+      this.tip = true;
+      this.zhida = null;
+      if (val === "") {
+        return;
+      }
+      this.page = 1;
+      this.timer = setTimeout(() => {
+        this.tipMessage = `<i class='icon-search'></i> 正在为您搜索《${
+          this.searchText
+        }》`;
+        this.loadingText = "正在搜索";
+        search(this.searchText, this.page, prePage, 1).then(data => {
+          console.log(data);
+          let song = data.data.song;
+          if (data.code !== 0 || !song.list.length) {
+            this.tipMessage = `搜索不到${this.searchText},换个试试吧`;
+            return;
+          }
+          this.tip = false;
+          this.searchList = _encaseSongList(song.list);
+          if (data.data.zhida.type === 2) {
+            this.zhida = data.data.zhida;
+          }
+          this.totalNum = parseInt(song.totalnum);
+          this.nowNum = prePage >= this.totalNum ? this.totalNum : prePage;
+          this.loading = prePage >= this.totalNum ? false : true;
+        });
+      }, 500);
+    }
   },
   created() {
     this._getHotKey();
@@ -180,23 +214,22 @@ export default {
     height: 40px;
     background-color: rgba(0, 0, 0, 0.05);
     top: 0;
-    div{
-        width: 100%;
-        height: 15px;
-        text-align: center;
+    div {
+      width: 100%;
+      height: 15px;
+      text-align: center;
     }
-    .tip{
-        font-size: @font-size-medium;
-        color: rgba(0, 0, 0, 1);
-        margin-top: 3px;
-        .no-wrap();
+    .tip {
+      font-size: @font-size-medium;
+      color: rgba(0, 0, 0, 1);
+      margin-top: 3px;
+      .no-wrap();
     }
-    .back{
-        font-size: @font-size-medium;
-        color: rgba(0, 0, 0, 0.5);
-        position: absolute;
-        bottom: 5px;
-        
+    .back {
+      font-size: @font-size-medium;
+      color: rgba(0, 0, 0, 0.5);
+      position: absolute;
+      bottom: 5px;
     }
   }
   .search-detail {
@@ -206,26 +239,26 @@ export default {
     bottom: 0;
     padding: 10px 20px;
     box-sizing: border-box;
-    .hot{
-        .key{
-            span{
-                display: inline-block;
-                margin: 10px 10px 0 0;
-                padding: 3px 6px;
-                font-size: @font-size-medium-x;
-                color:#000;
-                border: 1px solid rgba(0, 0, 0, 0.2);
-                border-radius: 12px;
-            }
+    .hot {
+      .key {
+        span {
+          display: inline-block;
+          margin: 10px 10px 0 0;
+          padding: 3px 6px;
+          font-size: @font-size-medium-x;
+          color: #000;
+          border: 1px solid rgba(0, 0, 0, 0.2);
+          border-radius: 12px;
         }
+      }
     }
-    .song-content{
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        overflow: hidden;
+    .song-content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      overflow: hidden;
     }
   }
 }
@@ -238,12 +271,14 @@ export default {
   opacity: 0;
 }
 
-.hot-enter,.hot-leave-to{
-    margin-top:200px; 
-    opacity: 0;
+.hot-enter,
+.hot-leave-to {
+  margin-top: 200px;
+  opacity: 0;
 }
-.hot-enter-active,.hot-leave-active{
-    transition: .5s;
+.hot-enter-active,
+.hot-leave-active {
+  transition: 0.5s;
 }
 </style>
 

@@ -3,6 +3,14 @@
         <div v-if="search" class="search">
             <input  type="text"  v-model="searchText" placeholder="搜索此歌手的歌曲">
         </div>
+        <div v-if="zhida" class="zhida" @click="selectZhida">
+            <img :src="`https://y.gtimg.cn/music/photo_new/T001R300x300M000${zhida.singermid}.jpg?max_age=2592000`">
+            <div class="text">
+                <span class="name">{{zhida.singername}}</span>
+                <div class="desc">单曲:{{zhida.songnum+"   "}}专辑:{{zhida.albumnum}}</div>
+            </div>
+            <i class="icon-right"></i>
+        </div>
         <ul>
             <li v-for="(song,index) in filterList" :class="{'c-song':(currentSong && song.id === currentSong.id),'noUrl':!song.url}" :key="index" @touchstart.once="audioPlay(song)" @click="_selectSong(song,index,filterList)">
                 <div class="song-container">
@@ -32,6 +40,10 @@ export default {
         loading:{
             type:Boolean,
             default:false
+        },
+        zhida:{
+            type:Object,
+            default:null
         }
     },
     data(){
@@ -66,6 +78,9 @@ export default {
                 el.play();
                 el.pause();
             }
+        },
+        selectZhida(){
+            this.$emit("selectZhida",this.zhida);
         }
     },
 }
@@ -78,7 +93,7 @@ export default {
     background: #fff;
     .loading{
         width: 100%;
-        height: 30px;
+        height: 50px;
         position: relative;
     }
 }
@@ -97,6 +112,39 @@ export default {
             height: 100%;
             border-radius: 2px;
             background: rgba(0, 0, 0, .07)
+        }
+    }
+    .zhida{
+        width: 100%;
+        padding: 0 20px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+        img{
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            margin-right: 20px;
+        }
+        .text{
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            .name,.desc{
+                height: 15px;
+                line-height: 15px;
+            }
+            .desc{
+                font-size: @font-size-medium;
+                color: @color-text-d;
+                margin-top: 5px;
+            }
+        }
+        i{
+            width: 10px;
+            color:rgba(0, 0, 0, 0.4);
         }
     }
     ul{

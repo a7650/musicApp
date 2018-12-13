@@ -1,5 +1,5 @@
 <template>
-<transition enter-active-class="animated fade" leave-active-class="animated fade">
+<transition>
     <div class="alert" >
         <div class="message">
             <p>{{message}}</p>

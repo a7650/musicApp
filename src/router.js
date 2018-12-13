@@ -50,6 +50,11 @@ export default new Router({
           name: 'discDetail',
           path: ':id',
           component: discDetail
+        },
+        {
+          name: 'zhidaDetail',
+          path: ':id',
+          component: singerDetail
         }
       ]
     }
