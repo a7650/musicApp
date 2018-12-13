@@ -2,7 +2,7 @@
     <div>
         <ul>
             <li v-for="(song,index) in playList" :key="index" @click="_selectSong(song,index)">
-                <span class="song-name" :class="{'c-song':(currentSong && song.id === currentSong.id)}">{{song.name | filterCurrent(song.id,currentSong.id)}}</span>
+                <span class="song-name" :class="{'c-song':(currentSong && song.id === currentSong.id)}">{{song.name | filterCurrent(song.id,currentSong.id,song.url)}}</span>
                 <span class="singer">-{{song.singer}}</span>
                 <span class="icon">
                     <i class="icon-unfavorite"></i>

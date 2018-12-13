@@ -5,6 +5,9 @@
           <div class="tip" v-show="searchList.length">
               共为您找到{{totalNum}}首歌{{"    "+nowNum+"/"+totalNum}}
           </div>
+          <div class="tip" v-show="tip" v-html="tipMessage">
+                
+          </div>
           <div class="back">点击此处返回</div>
       </div>
       <div class="search-detail">
@@ -20,7 +23,7 @@
             <div>
             <songList :loading="loading" v-show="searchList.length>0"  :songList="searchList" :search="false" @selectSong="_selectSong"></songList>
             </div>
-            <loading v-show="!searchList.length" loadingText="正在搜索"></loading>
+            <loading v-show="!searchList.length" :loadingText="loadingText"></loading>
         </scroll>
       </div>
       <alert v-if="alert" :message="alertMessage" @alertButton="alertButton"></alert>
@@ -51,8 +54,10 @@ export default {
         totalNum:0,
         nowNum:0,
         loading:false,
-        pullUp:true
-
+        pullUp:true,
+        tip:true,
+        tipMessage:"",
+        loadingText:""
     };
   },
   computed: {
@@ -110,10 +115,6 @@ export default {
         }
         search(this.searchText,this.page,n).then(data => {
             let newList =  _encaseSongList(data.data.song.list);
-            // for(let i=0;i<n;i++){
-
-            // }
-            console.log(newList.length);
             this.searchList=this.searchList.concat(newList);
             this.nowNum+=n;
         })
@@ -128,19 +129,29 @@ export default {
           if(this.timer){
               clearTimeout(this.timer);
           }
+          this.totalNum = this.nowNum = 0;
+          this.searchList=[];
+          this.tipMessage = this.loadingText = "在停止输入0.5s后会自动搜索";
+          this.tip = true;
           if(val===""){
-              this.searchList=[];
-              this.totalNum = this.nowNum = 0;
               return;
           };
-          this.search =1;
+          this.page = 1;
           this.timer = setTimeout(() => {
+              this.tipMessage = `<i class='icon-search'></i> 正在为您搜索《${this.searchText}》`;
+              this.loadingText = "正在搜索";
               search(this.searchText,this.page,prePage).then(data => {
+                  console.log(data);
                   let song = data.data.song;
+                  if(data.code !== 0  || !song.list.length){
+                      this.tipMessage = `搜索不到${this.searchText},换个试试吧`;
+                      return;
+                  }
+                  this.tip = false;
                   this.searchList = _encaseSongList(song.list);
-                  this.loading =true;
                   this.totalNum = parseInt(song.totalnum);
-                  this.nowNum = prePage*this.page;
+                  this.nowNum = prePage>=this.totalNum?this.totalNum:prePage;
+                  this.loading = prePage>=this.totalNum?false:true;
               })
           }, 500);
       }
@@ -175,9 +186,10 @@ export default {
         text-align: center;
     }
     .tip{
-        font-size: @font-size-medium-x;
-        color: rgba(0, 0, 0, 0.7);
+        font-size: @font-size-medium;
+        color: rgba(0, 0, 0, 1);
         margin-top: 3px;
+        .no-wrap();
     }
     .back{
         font-size: @font-size-medium;

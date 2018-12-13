@@ -252,12 +252,12 @@ export default {
       if (!(this.readyPlay && this.ready)) {
         return;
       }
-      if (this.currentIndex < this.playList.length - 1) {
+      if (this.playList.length === 1) {
+        this.loopSong();
+      } else if (this.currentIndex < this.playList.length - 1) {
         this.SET_CURRENTINDEX(this.currentIndex + 1);
       } else if (this.currentIndex === this.playList.length - 1) {
         this.SET_CURRENTINDEX(0);
-      } else if (this.playList.length === 1) {
-        this.loopSong();
       }
     },
     prevSong() {

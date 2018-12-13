@@ -107,7 +107,9 @@ export default {
     },
     clearSearchText() {
       this.searchText = "";
-      this.$refs.search.focus();
+      if(this.searchShow){
+        this.$refs.search.focus();
+      }
     },
     adaptMiniPlay(playList) {
       let bottom = playList.length > 0 ? "15%" : 0;
@@ -202,7 +204,6 @@ export default {
       color: @color-text-d;
       &.l {
         margin-right: -27px;
-        // z-index: 99;
         position: relative;
       }
       &.r {

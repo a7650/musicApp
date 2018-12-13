@@ -68,7 +68,6 @@ export default {
       },
       checkHeight(){
         let h = this.$refs.slider.clientHeight;
-        console.log(h);
         if(h!==0){
           this.$emit("sliderHeight",h)
         }
