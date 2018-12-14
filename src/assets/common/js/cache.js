@@ -24,7 +24,7 @@ export function getSearchHistory(){
     return storage.get(SEARCH_KEY,[])
 }
 
-export function clearSearchHistory(flag,index){
+export function clearSearchHistory({flag,index}){
     if(flag){
         storage.set(SEARCH_KEY,[]);
         return [];
@@ -32,6 +32,7 @@ export function clearSearchHistory(flag,index){
     else{
         let searches = storage.get(SEARCH_KEY,[]);
         searches.splice(index,1);
+        storage.set(SEARCH_KEY,searches);
         return searches;
     }
 }

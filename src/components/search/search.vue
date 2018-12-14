@@ -8,7 +8,7 @@
       </div>
       <div class="search-detail">
         <transition-group name="hot">
-          <div class="hot" v-show="!searchText" :key="1">
+          <div class="hot" v-show="!searchText" key="1">
             <header>热门搜索</header>
             <div class="key">
               <span
@@ -18,16 +18,18 @@
               >{{item.k}}</span>
             </div>
           </div>
-          <div class="search-history" v-show="!searchText" :key="2">
+          <div class="search-history" v-if="!searchText&&searchHistory.length" key="2">
               <header>
                   <span class="title">搜索历史</span>
-                  <span class="clear" @click="clearHistory(true)">清除记录</span>
+                  <span class="clear" @click="clearHistory(true)">清除历史</span>
               </header>
-              <ul>
-                  <li v-for="(val,index) in searchHistory" :key="index"  @click="selectHotKey(val)">
-                      <span>{{val}}</span><i @click.stop="clearHistory(false,index)" class="icon-false"></i>
-                  </li>
-              </ul>
+              <scroll :data="searchHistory" class="history-content" ref="historyContent">
+                <ul>
+                    <li v-for="(val,index) in searchHistory" :key="index"  @click="selectHotKey(val)">
+                        <span>{{val}}</span><i @click.stop="clearHistory(false,index)" class="icon-false"></i>
+                    </li>
+                </ul>
+              </scroll>
           </div>
         </transition-group>
         <scroll
@@ -87,7 +89,7 @@ export default {
       tip: true,
       tipMessage: "",
       loadingText: "",
-      button:["确认"]
+      button:[]
     };
   },
   computed: {
@@ -114,6 +116,10 @@ export default {
       let bottom = playList.length > 0 ? "10%" : 0;
       this.$refs.songContent.$el.style.bottom = bottom;
       this.$refs.songContent.refresh();
+      if(this.$refs.historyContent){
+        this.$refs.historyContent.$el.style.bottom = bottom;
+        this.$refs.historyContent.refresh();
+      }
     },
     closeSearch() {
       this.$emit("closeSearch");
@@ -139,10 +145,10 @@ export default {
       }
     },
     clearHistory(flag,index){
-      if(!this.searchHistory.length){
-        this._alert("这里没有历史纪录");
-        return;
-      }
+      // if(!this.searchHistory.length){
+      //   this._alert("这里没有历史纪录");
+      //   return;
+      // }
       if(flag){
         this._alert("你将清空所有历史记录",["取消","确定"]);
       }
@@ -162,10 +168,8 @@ export default {
             pic:`https://y.gtimg.cn/music/photo_new/T001R300x300M000${zhida.singermid}.jpg?max_age=2592000`
         };
         this.$emit("_selectZhida",singer);
-        this.SAVE_SEARCHHISTORY(this.searchText);
     },
     _selectSong(song, index) {
-        this.SAVE_SEARCHHISTORY(this.searchText);
       if (song.url === "") {
         this._alert("这首歌没有音源,版权方要钱，听听别的吧😁");
         return;
@@ -220,7 +224,6 @@ export default {
         }》`;
         this.loadingText = "正在搜索";
         search(this.searchText, this.page, prePage, 1).then(data => {
-          console.log(data);
           let song = data.data.song;
           if (data.code !== 0 || !song.list.length) {
             this.loadingText = this.tipMessage = `搜索不到《${this.searchText}》,换个试试吧`;
@@ -234,6 +237,7 @@ export default {
           this.totalNum = parseInt(song.totalnum);
           this.nowNum = prePage >= this.totalNum ? this.totalNum : prePage;
           this.loading = prePage >= this.totalNum ? false : true;
+          this.SAVE_SEARCHHISTORY(val);
         });
       }, 500);
     }
@@ -295,8 +299,8 @@ export default {
         span {
           display: inline-block;
           margin: 10px 10px 0 0;
-          padding: 3px 6px;
-          font-size: @font-size-medium-x;
+          padding: 5px 8px;
+          font-size: @font-size-medium;
           color: #000;
           border: 1px solid rgba(0, 0, 0, 0.2);
           border-radius: 12px;
@@ -305,6 +309,15 @@ export default {
     }
     .search-history{
         margin-top: 10px;
+        .history-content{
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 140px;
+          bottom: 0;
+          overflow: hidden;
+          padding: 0 20px;
+        }
         header{
             width: 100%;
             height: 30px;
@@ -312,6 +325,7 @@ export default {
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             span{
                 color: @color-text-d;
+                font-size: @font-size-medium;
             }
             .title{
                 float: left;
@@ -361,7 +375,7 @@ export default {
 
 .hot-enter,
 .hot-leave-to {
-  margin-top: 200px;
+  // margin-top: 400px;
   opacity: 0;
 }
 .hot-enter-active,

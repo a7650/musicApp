@@ -1,4 +1,4 @@
-import {mapGetters} from 'vuex'
+import {mapGetters,mapMutations,mapActions} from 'vuex'
 export const adaptMiniPlay = {
     computed:{
         ...mapGetters([
@@ -22,3 +22,4 @@ export const adaptMiniPlay = {
         }
     }
 }
+

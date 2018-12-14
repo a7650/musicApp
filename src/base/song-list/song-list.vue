@@ -168,6 +168,7 @@ export default {
             &.c-song{
                 padding-left: 17px;
                 border-left: 3px solid #000;
+                background: rgba(0, 0, 0, .05);
             }
         }
         .song-container{

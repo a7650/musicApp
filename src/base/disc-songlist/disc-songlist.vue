@@ -4,12 +4,13 @@
             <input type="text" v-model="searchText" placeholder="搜索歌曲">
         </div>
         <ul>
-            <li v-for="(song,index) in filterList" :class="{'c-song':(currentSong && song.id === currentSong.id),'rank-index':rank}" :key="index" @touchstart.once="audioPlay(song)" @click="selectSong(song,index,filterList)">
+            <li v-for="(song,index) in filterList" :class="{'c-song':(currentSong && song.id === currentSong.id),'rank-index':rank,'noUrl':!song.url}" :key="index" @touchstart.once="audioPlay(song)" @click="selectSong(song,index,filterList)">
                 <div class="index"><div class="index1">{{index+1}}</div><div class="rank" v-if="rank">{{song.rank}}</div></div>
                 <div class="text">
                     <span class="name">{{song.name | filterCurrent(song.id,currentSong.id,song.url)}}</span>
                     <span class="singer">{{song.singer}}-《{{song.album}}》</span>
                 </div>
+                <i class="icon-more" @click.stop="selectMore(song)"></i>
             </li>
         </ul>
     </div>
@@ -56,6 +57,9 @@ export default {
                 el.play();
                 el.pause();
             }
+        },
+        selectMore(song){
+            this.$emit("selectMore",song);
         }
     }
 
@@ -139,11 +143,26 @@ ul{
                 color: @color-text-d;
             }
         }
+        i{
+            display: inline-block;
+            width: 40px;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            font-size: @font-size-large;
+        }
     }
     .rank-index:nth-child(1),.rank-index:nth-child(2),.rank-index:nth-child(3){
         .index1{
             color: rgb(255, 72, 0);
         }
     }
+    .noUrl{
+            .name,.singer{
+                color: rgba(0, 0, 0, 0.3);
+            }
+        }
 }
+
+
 </style>

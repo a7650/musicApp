@@ -26,9 +26,11 @@
                     <img src="./drop.png" alt="">
                 </scroll>
                 <scroll class="song-content" ref="songContent" :data="songList" @scroll="scroll" :listenScroll="true" :probeType="3">
-                    <discSonglist :songList="songList" @selectSong="_selectSong" ref="disSonglist">
+                    <discSonglist :songList="songList" @selectMore="_selectMore" @selectSong="_selectSong" ref="disSonglist">
                     </discSonglist>
                     <loading v-if="!songList.length"></loading>
+                    <filter-bg v-if="songHandles" @click.native="_closeSongHandles"></filter-bg>
+                    <songHandle @closeSongHandles="_closeSongHandles" :currentSelect="currentSelect" v-if="songHandles"></songHandle>
                 </scroll>
             </div>
         </div>
@@ -48,6 +50,8 @@ import {adaptMiniPlay} from 'common/js/mixin'
 import {shuffle} from 'common/js/tools'
 import {formateHot} from 'common/js/tools'
 import loading from 'base/loading/loading'
+import songHandle from 'base/songHandle/songHandle'
+import filterBg from 'base/filter-bg/filter-bg'
 export default {
     mixins:[adaptMiniPlay],
     data(){
@@ -57,7 +61,9 @@ export default {
             desc:[],
             dissname:"",
             tags:[],
-            hot:0
+            hot:0,
+            currentSelect:null,
+            songHandles:false
         }
     },
     computed:{
@@ -71,7 +77,7 @@ export default {
         ])
     },
     components:{
-        musicList,rtol,scroll,discSonglist,loading
+        musicList,rtol,scroll,discSonglist,loading,songHandle,filterBg
     },
     methods:{
         scroll(pos){
@@ -113,6 +119,14 @@ export default {
                 list:[...filterList],
                 index
             })
+        },
+        _selectMore(song){
+            this.songHandles = true;
+            this.currentSelect = song;
+        },
+        _closeSongHandles(){
+            this.songHandles =false ;
+            this.currentSelect = null;
         },
         ...mapActions([
             "selectSong"
@@ -296,9 +310,7 @@ export default {
             bottom: 0;
             left: 0;
             right: 0;
-            &>div{
-                background: #fff;
-            }
+           
         }
     }
 }

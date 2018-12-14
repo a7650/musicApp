@@ -12,7 +12,7 @@
       <i class="r icon-false" @click="clearSearchText" v-if="searchText"></i>
       <search
         :searchText="searchText"
-        v-show="searchShow"
+        v-if="searchShow"
         @closeSearch="searchShow=false;clearSearchText()"
         @selectHotKey="selectHotKey"
         @_selectZhida="selectZhida"

@@ -1,4 +1,5 @@
 <template>
+    <transition name="alert">
     <div class="alert" >
         <div class="message">
             <p>{{message}}</p>
@@ -9,6 +10,7 @@
             </span>
         </div>
     </div>
+    </transition>
 </template>
 
 <script>
@@ -79,5 +81,11 @@ export default {
         }
         
     }
+}
+.alert-enter-active,.alert-leave-active{
+    transition: .2s;
+}
+.alert-enter,.alert-leave-to{
+    opacity: 0;
 }
 </style>
