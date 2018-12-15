@@ -17,6 +17,7 @@
                     <div class="song-name"  v-html="filterSong(song.name,song.id,currentSong.id,song.url)"></div>
                     <div class="desc" v-html="_getDesc(song)"></div>
                 </div>
+                <i class="icon-more" @click.stop="selectMore(song)"></i>
             </li>
         </ul>
         <div class="loading" v-show="loading"><loading loadingText=""></loading></div>
@@ -27,6 +28,8 @@
 import { mapGetters } from 'vuex'
 import {filterArray} from 'common/js/tools'
 import loading from 'base/loading/loading'
+
+
 export default {
 
     props:{
@@ -70,6 +73,9 @@ export default {
         },
         _selectSong(song,index,filterList){
             this.$emit("selectSong",song,index,filterList);
+        },
+        selectMore(song){
+            this.$emit("selectMore",song)
         },
         audioPlay(song){
             if(this.playList.length === 0){
@@ -165,6 +171,7 @@ export default {
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             padding:  0 20px;
             box-sizing: border-box;
+            display: flex;
             &.c-song{
                 padding-left: 17px;
                 border-left: 3px solid #000;
@@ -172,7 +179,8 @@ export default {
             }
         }
         .song-container{
-            width: 100%;
+            flex: 1;
+            width:1px;
             display: flex;
             flex-direction: column;
             margin-top: 10px;
@@ -189,6 +197,14 @@ export default {
                 color: @color-text-d;
                 font-size: @font-size-medium;
             }
+        }
+        i{
+            width: 40px;
+            height: 50px;
+            text-align: right;
+            line-height: 50px;
+            font-size: @font-size-large-x;
+            color: rgba(0, 0, 0, 0.4);
         }
         .noUrl{
             .song-name,.desc{

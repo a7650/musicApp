@@ -146,7 +146,6 @@ export default {
       getDiscList().then(
         res => {
           this.discList = res;
-          console.log(this.discList);
         },
         err => {
           console.log(err);

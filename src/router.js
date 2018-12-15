@@ -7,6 +7,9 @@ import mine from 'components/mine/mine'
 import singerDetail from 'components/singer-detail/singer-detail'
 import discDetail from 'components/disc-detail/disc-detail'
 import rankDetail from 'components/rank-detail/rank-detail'
+import myAlbum from 'components/myAlbum/myAlbum'
+import playHistory from 'components/playHistory/playHistory' 
+import myAlbumDetail from 'components/myAlbum/myalbum-detail'
 Vue.use(Router)
 
 export default new Router({
@@ -40,7 +43,25 @@ export default new Router({
     },
     {
       path: '/mine',
-      component: mine
+      component: mine,
+      redirect:'/mine/myAlbum',
+      children: [
+        {
+          path: '/mine/myAlbum',
+          component: myAlbum,
+          children:[
+            {
+              name:'myAlbumDetail',
+              path: ':id',
+              component:myAlbumDetail
+            }
+          ]
+        },
+        {
+          path:'/mine/playHistory',
+          component:playHistory
+        }
+      ]
     },
     {
       path: '/recommend',

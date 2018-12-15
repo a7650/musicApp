@@ -77,7 +77,6 @@ export default {
         _getRankList(){
             getRankList().then(data => {
                 this.topList=data.topList;
-                console.log(this.topList);
             },err => {
                 console.log(err);
             })

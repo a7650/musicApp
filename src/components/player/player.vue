@@ -39,9 +39,6 @@
             <span class="dot" :class="{active:activePage === 0}"></span>
             <span class="dot" :class="{active:activePage === 1}"></span>
           </div>
-          <div class="favorite">
-            <i class="icon-unfavorite"></i>
-          </div>
           <div class="right" ref="mainRight">
             <div class="no-lyric" v-if="noLyric">暂无歌词</div>
             <scroll class="lyric-content" ref="lyricLists" :data="currentLyric&&currentLyric.lines">
@@ -57,6 +54,9 @@
                 </ul>
               </div>
             </scroll>
+          </div>
+          <div class="favorite" @click="setFavorite">
+            <i :class="favoriteIcon"></i>
           </div>
         </div>
         <!-- footer -->
@@ -105,14 +105,14 @@
     </div>
 
     <!-- mini-list -->
-    <div class="list-bg" v-if="listShow" @click="listShow=false"></div>
+    <div class="list-bg" v-show="listShow" @click="listShow=false"></div>
     <mini-list-animation>
       <div class="mini-list" v-if="listShow">
         <header>
           <div class="icon" @click="toggleMode">
             <i :class="modeIcon"></i>
           </div>
-          <div class="title">播放列表</div>
+          <div class="title">播放列表({{playList.length}})</div>
           <div></div>
         </header>
         <scroll class="list-content">
@@ -142,7 +142,7 @@ import { playMode } from "common/config";
 import { shuffle } from "common/js/tools";
 import processBar from "base/process-bar/process-bar";
 import Lyric from "lyric-parser";
-
+import {isFavorite} from 'common/js/favorite'
 const MIN_DISTANCE = 0.2;
 
 export default {
@@ -159,6 +159,14 @@ export default {
     };
   },
   computed: {
+    favoriteIcon(){
+      let mid = this.favoriteMid;
+      let m = isFavorite(this.currentSong.mid);
+      return {
+        "icon-favorite":m,
+        "icon-unfavorite":!m
+      }
+    },
     bgStyle() {
       return { "background-image": `url(${this.currentSong.image})` };
     },
@@ -193,7 +201,8 @@ export default {
       "playList",
       "sequenceList",
       "currentIndex",
-      "playMode"
+      "playMode",
+      "favoriteMid"
     ])
   },
   components: {
@@ -205,6 +214,15 @@ export default {
     scroll
   },
   methods: {
+    setFavorite(){
+      let m = isFavorite(this.currentSong.mid);
+      if(m){
+        this.DELETE_FAVORITE(this.currentSong);
+      }else{
+        this.ADD_FAVORITE(this.currentSong);
+      }
+      this.REFRESH_MYALBUM();
+    },
     audioReadyPlay() {
       this.readyPlay = true;
       if (this.currentLyric) {
@@ -398,7 +416,10 @@ export default {
       "SET_CURRENTINDEX",
       "SET_PLAYMODE",
       "SET_PLAYLIST",
-      "SET_PLAYER"
+      "SET_PLAYER",
+      "ADD_FAVORITE",
+      "DELETE_FAVORITE",
+      "REFRESH_MYALBUM"
     ]),
     ...mapActions(["deleteSong"])
   },
@@ -807,6 +828,7 @@ export default {
   left: 0;
   bottom: 0;
   right: 0;
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .mini-list {
@@ -816,18 +838,21 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   animation-duration: 0.3s;
+ 
   header {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 90%;
+    bottom: 93%;
     padding: 0 5%;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    color: #000;
+     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     div {
       flex: 1;
     }
@@ -843,7 +868,7 @@ export default {
   }
   .list-content {
     position: absolute;
-    top: 10%;
+    top: 7%;
     left: 0;
     right: 0;
     bottom: 10%;
@@ -857,8 +882,9 @@ export default {
     right: 0;
     bottom: 0;
     text-align: center;
-    border-top: 1px solid @color-text-dd;
-    background-color: rgba(0, 0, 0, 0.7);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.95);
+    color: #000;
   }
 }
 

@@ -49,12 +49,16 @@
               :search="false"
               @selectSong="_selectSong"
               @selectZhida="_selectZhida"
+              @selectMore="_selectMore"
             ></songList>
           </div>
           <loading v-show="!searchList.length" :loadingText="loadingText"></loading>
         </scroll>
       </div>
+      <filter-bg v-if="songHanders" @click.native="_closeSongHandles('')"></filter-bg>
+      <song-handle :currentSelect="currentSelect" @closeSongHandles="_closeSongHandles" v-if="songHanders"></song-handle>
       <alert v-if="alert" :message="alertMessage" @alertButton="alertButton" :button="button"></alert>
+      <Float :float_message="float_message" v-if="float"></Float>
     </div>
   </transition>
   
@@ -66,13 +70,16 @@ import songList from "base/song-list/song-list";
 import { _encaseSongList } from "common/js/song";
 import scroll from "base/scroll/scroll";
 import { mapActions,mapGetters } from "vuex";
-import { adaptMiniPlay } from "common/js/mixin";
+import { adaptMiniPlay,float } from "common/js/mixin";
 import loading from "base/loading/loading";
 import alert from "base/alert/alert";
 import {mapMutations} from 'vuex'
+import songHandle from 'base/songHandle/songHandle'
+import Float from 'base/float/float'
+import filterBg from 'base/filter-bg/filter-bg'
 const prePage = 20;
 export default {
-  mixins: [adaptMiniPlay],
+  mixins: [adaptMiniPlay,float],
   props: ["searchText"],
   data() {
     return {
@@ -89,7 +96,9 @@ export default {
       tip: true,
       tipMessage: "",
       loadingText: "",
-      button:[]
+      button:[],
+      songHanders:false,
+      currentSelect:null
     };
   },
   computed: {
@@ -106,7 +115,10 @@ export default {
     songList,
     scroll,
     loading,
-    alert
+    alert,
+    songHandle,
+    Float,
+    filterBg
   },
   methods: {
     scrollToEnd() {
@@ -183,6 +195,22 @@ export default {
       }
       this.selectSearchSong(song);
 
+    },
+    _selectMore(song){
+        if(song.url===""){
+          this._alert("这首歌没有音源,版权方要钱，听听别的吧😁");
+          return;
+        }
+        this.currentSelect = song;
+        this.songHanders = true;
+    },
+    _closeSongHandles(val){
+        if(val){
+            this.mixin_float(val);
+        }
+        this.currentSelect = null;
+        this.songHanders = false;
+        
     },
     searchMore() {
       if (this.otherNum <= 0) {

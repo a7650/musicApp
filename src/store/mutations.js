@@ -1,5 +1,7 @@
 import * as types from './mutation-types'
-import {saveSearchHistory,clearSearchHistory} from 'common/js/cache'
+import {saveSearchHistory,clearSearchHistory,getMyAlbum} from 'common/js/cache'
+import {getFavoriteMid,addFavorite,deleteFavorite} from 'common/js/favorite'
+import { type } from 'os';
 
 const mutations = {
     [types.SET_SINGER](state,singer){
@@ -76,6 +78,37 @@ const mutations = {
 
     [types.CLEAR_SEARCHHISTORY](state,payload){
         state.searchHistory = clearSearchHistory(payload);
+    },
+
+    [types.NEXT_PLAY](state,song){
+        let newSong = Object.assign({},song);
+        newSong.id = Symbol();
+        newSong.getLyric = song.getLyric;
+        console.log(newSong);
+        state.playList.splice(state.currentIndex+1,0,newSong);
+        if(state.playList.length===1){
+            state.currentIndex = 0;
+            state.playing = true;
+            state.sequenceList = state.playList;
+        }
+    },
+
+    [types.ADD_FAVORITE](state,song){
+        addFavorite(song);
+        state.favoriteMid =  getFavoriteMid();
+    },
+
+    [types.DELETE_FAVORITE](state,song){
+        deleteFavorite(song);
+        state.favoriteMid = getFavoriteMid();
+    },
+
+    [types.REFRESH_FAVORITE](state){
+        state.favoriteMid = getFavoriteMid();
+    },
+
+    [types.REFRESH_MYALBUM](state){
+        state.myAlbum = getMyAlbum();
     }
 
 

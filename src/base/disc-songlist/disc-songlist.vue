@@ -10,7 +10,7 @@
                     <span class="name">{{song.name | filterCurrent(song.id,currentSong.id,song.url)}}</span>
                     <span class="singer">{{song.singer}}-《{{song.album}}》</span>
                 </div>
-                <i class="icon-more" @click.stop="selectMore(song)"></i>
+                <i class="icon-more" @click.stop="selectMore(song,index)"></i>
             </li>
         </ul>
     </div>
@@ -58,8 +58,8 @@ export default {
                 el.pause();
             }
         },
-        selectMore(song){
-            this.$emit("selectMore",song);
+        selectMore(song,index){
+            this.$emit("selectMore",song,index);
         }
     }
 

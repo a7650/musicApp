@@ -16,7 +16,7 @@
                     </div>
                     <div class="other">
                         <div class="title">{{title}}</div>
-                        <div class="dissname">{{dissname}}</div>
+                        <div class="dissname" v-html="dissname"></div>
                         <div class="tags"><span v-for="(tag,index) in tags" :key="index">{{tag.name}}</span></div>
                         <div class="play"><i class="icon-play" @click="randomPlay"></i></div>
                     </div>
@@ -29,10 +29,11 @@
                     <discSonglist :songList="songList" @selectMore="_selectMore" @selectSong="_selectSong" ref="disSonglist">
                     </discSonglist>
                     <loading v-if="!songList.length"></loading>
-                    <filter-bg v-if="songHandles" @click.native="_closeSongHandles"></filter-bg>
+                    <filter-bg v-if="songHandles" @click.native="_closeSongHandles('')"></filter-bg>
                     <songHandle @closeSongHandles="_closeSongHandles" :currentSelect="currentSelect" v-if="songHandles"></songHandle>
                 </scroll>
             </div>
+            <Float v-if="float" :float_message="float_message"></Float>
         </div>
     </rtol>
 </template>
@@ -46,14 +47,15 @@ import rtol from 'base/animation/right-to-left'
 import scroll from 'base/scroll/scroll'
 import discSonglist from 'base/disc-songlist/disc-songlist'
 import {mapActions} from 'vuex'
-import {adaptMiniPlay} from 'common/js/mixin'
+import {adaptMiniPlay,float} from 'common/js/mixin'
 import {shuffle} from 'common/js/tools'
 import {formateHot} from 'common/js/tools'
 import loading from 'base/loading/loading'
 import songHandle from 'base/songHandle/songHandle'
 import filterBg from 'base/filter-bg/filter-bg'
+import Float from 'base/float/float'
 export default {
-    mixins:[adaptMiniPlay],
+    mixins:[adaptMiniPlay,float],
     data(){
         return {
             songList:[],
@@ -77,7 +79,7 @@ export default {
         ])
     },
     components:{
-        musicList,rtol,scroll,discSonglist,loading,songHandle,filterBg
+        musicList,rtol,scroll,discSonglist,loading,songHandle,filterBg,Float
     },
     methods:{
         scroll(pos){
@@ -124,7 +126,10 @@ export default {
             this.songHandles = true;
             this.currentSelect = song;
         },
-        _closeSongHandles(){
+        _closeSongHandles(val){
+            if(val){
+                this.mixin_float(val);
+            }
             this.songHandles =false ;
             this.currentSelect = null;
         },
@@ -134,8 +139,6 @@ export default {
     },
     created(){
         this._getDiscSongList();
-    },
-    mounted(){
     }
 }
 </script>

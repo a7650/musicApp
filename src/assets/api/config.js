@@ -13,4 +13,4 @@ export const options = {
 
 export const ERR_OK = 0
 
-export const PRODUCTION = false;
+export const PRODUCTION = true;

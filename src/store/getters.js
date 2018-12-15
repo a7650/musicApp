@@ -21,3 +21,7 @@ export const getPlayer = state =>  state.player
 export const rankBar = state =>  state.rankBar
 
 export const searchHistory = state => state.searchHistory
+
+export const myAlbum = state => state.myAlbum
+
+export const favoriteMid = state => state.favoriteMid
