@@ -18,6 +18,7 @@
         <i class="icon-right"></i>
       </div>
     </div>
+    <div v-for="i in refreshAlbum" ></div>
       </div>
     </scroll>
     <div class="my-collect-album"></div>
@@ -26,11 +27,10 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
 import scroll from 'base/scroll/scroll'
 import { adaptMiniPlay } from "common/js/mixin";
 import {getCreateAlbum,getCollectAlbum} from 'common/js/cache'
-import {mapMutations} from 'vuex'
+import {mapMutations,mapGetters} from 'vuex'
 export default {
     mixins: [adaptMiniPlay],
   components:{
@@ -43,7 +43,15 @@ export default {
     }
   },
   computed: {
-
+      refreshAlbum(){
+        var m = this.myAlbum;
+         this.createAlbum = getCreateAlbum();
+         this.collectAlbum = getCollectAlbum();
+         return m;
+      },
+     ...mapGetters([
+       "myAlbum"
+     ])
   },
   methods:{
     adaptMiniPlay(playList){

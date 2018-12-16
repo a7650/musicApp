@@ -1,12 +1,13 @@
 <template>
   <rtol>
     <div class="create-album-detail">
-        <Header icon="icon-more" :title="this.name"></Header>
+        <Header icon="icon-more" :title="this.name" @clickMore="clickMore"></Header>
         <Album :songList="songList" :name="name" :bgUrl="bgUrl" :desc="desc" @_selectMore="selectMore"></album>
-        <filter-bg v-if="songHanders" @click.native="closeHanders"></filter-bg>
+        <filter-bg v-if="songHanders||albumHanders" @click.native="closeHanders"></filter-bg>
         <float v-if="float" :float_message="float_message"></float>
         <song-handle :othersHander="othersHander" v-if="songHanders" @othersHandle="othersHandle"></song-handle>
-        
+        <song-handle :othersHander="albumHander" v-if="albumHanders" @othersHandle="othersHandle"></song-handle>
+        <alert v-if="alert" :message="alertMessage" :button="alertButton" @alertButton="selectAlert"></alert>
     </div>
   </rtol>
 </template>
@@ -22,7 +23,8 @@ import filterBg from 'base/filter-bg/filter-bg'
 import songHandle from 'base/songHandle/songHandle'
 import {mapMutations} from "vuex"
 import {float } from "common/js/mixin"
-
+import alert from 'base/alert/alert'
+import {deleteAlbum} from 'common/js/cache'
 export default {
     mixins: [float],
     data(){
@@ -38,13 +40,52 @@ export default {
                 {type:"_delete",mes:"从歌单中删除"},
                 {type:"_nextPlay",mes:"下一首播放"},
                 {type:"_close",mes:"取消"}
-            ]
+            ],
+            albumHander:[
+                {type:"_editDesc",mes:"编辑简介"},
+                {type:"_deleteAlbum",mes:"删除歌单"},
+                {type:"_close",mes:"取消"}
+            ],
+            albumHanders:false,
+            alertMessage:"",
+            alertButton:[],
+            alert:false
         }
     },
   components: {
-    rtol,Header,Album,Float,songHandle,filterBg
+    rtol,Header,Album,Float,songHandle,filterBg,alert
   },
   methods:{
+      _alert(mes,button){
+          this.alertMessage = mes;
+          this.alertButton = button;
+          this.alert = true;
+      },
+      selectAlert(index){
+          if(index === 0){
+              this.alert = false;
+              this.closeHanders();
+          }
+          if(index === 1){
+            this.alert = false;
+            this.closeHanders();
+            let m = deleteAlbum(this.name)
+            this.mixin_float(m.mes);      
+            if(m.type === 1){
+                this.REFRESH_MYALBUM();
+            }
+        }
+      },
+      _editDesc(){
+          console.log("edit");
+          this.closeHanders();
+      },
+      _deleteAlbum(){
+          this._alert("确定删除吗",["取消","确定"]);
+      },
+      clickMore(){
+          this.albumHanders = true;
+      },
       _getCreateAlbum(){
           let album = getCreateAlbum(this.name);
           if(album.songList.length){
@@ -78,6 +119,7 @@ export default {
           this.songHanders = false;
           this.selectSong = null;
           this.selectIndex = -1;
+          this.albumHanders = false;
       },
       selectMore(song,index){
           this.songHanders = true;
@@ -104,7 +146,7 @@ export default {
       _close(){
           this.closeHanders();
       },
-      ...mapMutations(["NEXT_PLAY"])
+      ...mapMutations(["NEXT_PLAY","REFRESH_MYALBUM"])
   },
   created(){
       this.name = this.$route.params.id;

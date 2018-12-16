@@ -14,7 +14,6 @@
 </template>
 
 <script>
-import animated from 'animate.css'
 export default {
     props:{
         message:{

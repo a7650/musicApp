@@ -129,7 +129,27 @@ export function createAlbum(name,desc){
         }catch(e){
             return {type:0,mes:"创建失败"}
         }
-        
+    }
+}
+export function deleteAlbum(name){
+    if(name==="我的收藏"){
+        return {type:"0",mes:"不能删除默认歌单"}
+    }
+    try{
+        let allAlbum = getCreateAlbum();
+        let n = allAlbum.findIndex(item=>item.name===name);
+        if(n<0){
+            return {type:0,mes:"该歌单不存在"}
+        }
+        allAlbum.splice(n,1);
+        storage.set(CREATEALBUM_KEY,allAlbum);
+        let myAlbum = getMyAlbum();
+        let m = myAlbum.findIndex(item=>item.name===name);
+        myAlbum.splice(m,1);
+        storage.set(MYALBUM_KEY,myAlbum)
+        return {type:1,mes:"删除成功<br>你还可以再听一下"}
+    }catch(e){
+        return {type:0,mes:"删除失败请重试"}
     }
 }
 
