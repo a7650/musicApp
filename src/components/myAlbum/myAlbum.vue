@@ -1,14 +1,24 @@
 <template>
   <div class="my-album">
     <scroll class="album-content" ref="albumContent">
-      <div class="my-create-album">
+      <div>
+        <div class="my-create-album album" >
         <header>我创建的歌单</header>
-      <div v-for="(item,index) in allAlbum" class="album" :key="index" @click="selectCreateAlbum(item)">
+      <div v-for="(item,index) in createAlbum" class="album" :key="index" @click="selectCreateAlbum(item)">
         <img :src="albumBg(item)">
         <div class="desc">{{item.name}}({{item.songList.length}})</div>
         <i class="icon-right"></i>
       </div>
     </div>
+    <div class="my-collect-album album" v-if="collectAlbum.length">
+      <header>我收藏的歌单</header>
+      <div v-for="(item,index) in collectAlbum" class="album" :key="index" @click="selectCollectAlbum(item)">
+        <img :src="albumBg(item)">
+        <div class="desc">{{item.name}}</div>
+        <i class="icon-right"></i>
+      </div>
+    </div>
+      </div>
     </scroll>
     <div class="my-collect-album"></div>
     <router-view></router-view>
@@ -19,19 +29,20 @@
 import { mapGetters } from "vuex";
 import scroll from 'base/scroll/scroll'
 import { adaptMiniPlay } from "common/js/mixin";
-import {getCreateAlbum} from 'common/js/cache'
-
+import {getCreateAlbum,getCollectAlbum} from 'common/js/cache'
+import {mapMutations} from 'vuex'
 export default {
     mixins: [adaptMiniPlay],
   components:{
     scroll
   },
+  data(){
+    return{
+      createAlbum:[],
+      collectAlbum:[]
+    }
+  },
   computed: {
-    allAlbum(){
-      let a = this.myAlbum;
-      return getCreateAlbum();
-    },
-    ...mapGetters(["myAlbum"])
 
   },
   methods:{
@@ -53,10 +64,32 @@ export default {
         }
 
         )
-    }
+    },
+    selectCollectAlbum(item){
+      this.$router.push({
+        name:"collectAlbumDetail",
+        params:{
+          id:item.dissid
+        }
+      })
+      this.SET_SINGER(item);
+    },
+    ...mapMutations([
+      "SET_SINGER"
+    ])
   },
   mounted(){
     this.$refs.albumContent.refresh();
+  },
+  created(){
+    this.createAlbum = getCreateAlbum();
+    this.collectAlbum = getCollectAlbum();
+  },
+  activated(){
+    this.createAlbum = getCreateAlbum();
+    this.collectAlbum = getCollectAlbum();
+    this.$refs.albumContent.refresh();
+
   }
 };
 </script>
@@ -79,7 +112,7 @@ export default {
     right: 0;
     overflow: hidden;
   }
-  .my-create-album {
+  .album {
     width: 100%;
     header{
         width: 100%;

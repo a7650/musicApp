@@ -54,7 +54,12 @@ export default new Router({
               name:'myAlbumDetail',
               path: ':id',
               component:myAlbumDetail
-            }
+            },
+            {
+              name: 'collectAlbumDetail',
+              path: ':id',
+              component: discDetail
+            },
           ]
         },
         {

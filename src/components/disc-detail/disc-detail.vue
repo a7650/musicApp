@@ -6,12 +6,12 @@
             <header>
                <div class="back" @click = "back"> <i class="icon-left"></i></div>
                <div class="title">歌单</div>
-               <div class="more"><i class="icon-more"></i></div>
+               <div class="more" @click="albumHandle"><i class="icon-more"></i></div>
             </header>
             <div class="scroll-area">
                 <div class="text">
                     <div class="logo">
-                        <img :src="this.singer.imgurl" alt="">
+                        <img :src="this.singer.imgurl||this.singer.bgUrl" alt="">
                         <div class="hot">{{hot}}人收听</div>
                     </div>
                     <div class="other">
@@ -29,11 +29,13 @@
                     <discSonglist :songList="songList" @selectMore="_selectMore" @selectSong="_selectSong" ref="disSonglist">
                     </discSonglist>
                     <loading v-if="!songList.length"></loading>
-                    <filter-bg v-if="songHandles" @click.native="_closeSongHandles('')"></filter-bg>
+                    <filter-bg v-if="songHandles||collectAlbum" @click.native="_closeSongHandles('')"></filter-bg>
                     <songHandle @closeSongHandles="_closeSongHandles" :currentSelect="currentSelect" v-if="songHandles"></songHandle>
+                    <songHandle :othersHander="othersHander" v-if="collectAlbum" @othersHandle="othersHandle"></songHandle>
                 </scroll>
             </div>
             <Float v-if="float" :float_message="float_message"></Float>
+
         </div>
     </rtol>
 </template>
@@ -54,6 +56,7 @@ import loading from 'base/loading/loading'
 import songHandle from 'base/songHandle/songHandle'
 import filterBg from 'base/filter-bg/filter-bg'
 import Float from 'base/float/float'
+import {setCollectAlbum,deleteCollectAlbum,isCollect} from  'common/js/cache'
 export default {
     mixins:[adaptMiniPlay,float],
     data(){
@@ -64,14 +67,23 @@ export default {
             dissname:"",
             tags:[],
             hot:0,
+            isCollect:false,
             currentSelect:null,
-            songHandles:false
+            songHandles:false,
+            collectAlbum:false
         }
     },
     computed:{
+        othersHander(){
+            if(this.isCollect){
+                return [{type:"_deleteAlbum",mes:"取消收藏"},{type:"_close",mes:"取消"}]
+            }else{
+                return  [{type:"_collectAlbum",mes:"收藏这个歌单"},{type:"_close",mes:"取消"}]
+            }
+        },
         bgStyle(){
             return {
-                "background-image":`url(${this.singer.imgurl})`
+                "background-image":`url(${this.singer.imgurl||this.singer.bgUrl})`
             }
         },
        ...mapGetters([
@@ -82,6 +94,31 @@ export default {
         musicList,rtol,scroll,discSonglist,loading,songHandle,filterBg,Float
     },
     methods:{
+        _close(){
+            this._closeSongHandles();
+        },
+        _collectAlbum(){
+           let m = setCollectAlbum({bgUrl:this.singer.imgurl||this.singer.bgUrl,name:this.singer.name||this.singer.creator.name,dissname:this.singer.dissname,dissid:this.singer.dissid,collectAlbum:true});
+           if(m.type===1){
+               this.isCollect = true;
+           }
+           this._closeSongHandles(m.mes);
+        },
+        _deleteAlbum(){
+            let m = deleteCollectAlbum(this.singer);
+            if(m.type===1){
+                this.isCollect=false;
+            }
+           this._closeSongHandles(m.mes);
+         
+            
+        },
+        othersHandle(type){
+          this[type]();
+      },
+        albumHandle(){
+            this.collectAlbum = true;
+        },
         scroll(pos){
             if(pos.y < 0){
                 this.$refs.disSonglist.$el.style.boxShadow = "0 -10px 10px rgba(0,0,0,.2)";
@@ -132,6 +169,7 @@ export default {
             }
             this.songHandles =false ;
             this.currentSelect = null;
+            this.collectAlbum = false;
         },
         ...mapActions([
             "selectSong"
@@ -139,6 +177,7 @@ export default {
     },
     created(){
         this._getDiscSongList();
+        this.isCollect = isCollect(this.singer);
     }
 }
 </script>
@@ -238,6 +277,7 @@ export default {
                 }
             }
             .other{
+                color: #fff;
                 max-height: 150px;
                 box-sizing: border-box;
                 overflow: hidden;

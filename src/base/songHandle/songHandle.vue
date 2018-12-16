@@ -111,7 +111,6 @@ export default {
       if(m.type === 1){
         this._back();
         this.otherAlbum = getMyAlbum();
-        console.log(this.otherAlbum)
         this.REFRESH_MYALBUM();
       }
       this.mixin_float(m.mes);

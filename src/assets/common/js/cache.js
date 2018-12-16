@@ -123,6 +123,7 @@ export function createAlbum(name,desc){
             storage.set(MYALBUM_KEY,all);
             let album = getCreateAlbum();
             album.splice(1,0,{name,desc,bgImg:"",songList:[]});
+            console.log(album);
             storage.set(CREATEALBUM_KEY,album);
             return {type:1,mes:"创建成功"}
         }catch(e){
@@ -131,3 +132,45 @@ export function createAlbum(name,desc){
         
     }
 }
+
+
+export function getCollectAlbum(){
+    return storage.get(COLLECTALBUM_KEY,[]);
+}
+
+// {imgurl,creator.name,dissname,dissid}
+
+export function setCollectAlbum(album){
+    let allalbum = getCollectAlbum();
+    let n = allalbum.findIndex(item=>item.dissid===album.dissid);
+    if(n>-1){
+        return {type:0,mes:"你已经收藏过这个歌单了"}
+    }else{
+        try{
+            allalbum.unshift(album)
+            storage.set(COLLECTALBUM_KEY,allalbum);
+            return {type:1,mes:"收藏成功"}
+        }catch(e){
+            return {type:0,mes:"收藏失败"}
+        }
+    }
+}
+
+export function deleteCollectAlbum(album){
+    let allalbum = getCollectAlbum();
+    let n = allalbum.findIndex(item=>item.dissid===album.dissid);
+    try{
+        allalbum.splice(n,1)
+        storage.set(COLLECTALBUM_KEY,allalbum);
+        return {type:1,mes:"已取消收藏<br>你还可以再听一下"}
+    }catch(e){
+        return {type:0,mes:"出现错误，请重试，或者刷新页面"}
+    }
+}
+
+export function isCollect(album){
+    let allalbum = getCollectAlbum();
+    let n = allalbum.findIndex(item=>item.dissid===album.dissid);
+    return n > -1;
+}
+

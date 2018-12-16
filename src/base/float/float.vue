@@ -1,7 +1,7 @@
 <template>
   <transition name="float">
     <div class="float">
-      <span>{{float_message}}</span>
+      <span v-html="float_message"></span>
     </div>
   </transition>
 </template>
