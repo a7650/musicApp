@@ -141,6 +141,7 @@ export default {
       switch (index) {
         case 0:
           let m = this.addFavorite(this.currentSelect);
+          console.log(this.currentSelect)
           this.$emit("closeSongHandles", m);
           break;
         case 1:

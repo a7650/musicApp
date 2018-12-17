@@ -1,7 +1,7 @@
 import jsonp from 'common/js/jsonp'
 import {_getLyric} from 'api/song'
-import base64 from 'js-base64'
-import { promises } from 'fs';
+import {Base64} from 'js-base64'
+
 
 
 
@@ -53,6 +53,24 @@ export function createSong(musicData,vkey,r){
         url:"",
         rank:r
     })
+}
+export function getLyric(){
+    if(this.lyric){
+        return Promise.resolve(this.lyric)
+    }
+    else{
+        return new Promise((resolve,reject) => {
+            _getLyric(this.mid).then(data => {
+                if(data.retcode == 0){
+                    this.lyric = Base64.decode(data.lyric);
+                    resolve(this.lyric);
+                }
+                else{
+                    reject("暂无歌词")
+                }
+            })
+        })
+    }
 }
 
 

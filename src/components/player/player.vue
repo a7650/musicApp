@@ -143,6 +143,7 @@ import { shuffle } from "common/js/tools";
 import processBar from "base/process-bar/process-bar";
 import Lyric from "lyric-parser";
 import {isFavorite} from 'common/js/favorite'
+import { setPlayHistory } from "common/js/cache";
 const MIN_DISTANCE = 0.2;
 
 export default {
@@ -441,6 +442,7 @@ export default {
       this.$refs.audio.src = newSong.url;
       this.$refs.audio.play();
       this.SET_PLAYING(true);
+      setPlayHistory(this.currentSong)
       // if(this.timer){clearTimeout(this.timer)}
       // this.timer = setTimeout(() => {
       //     if(this.currentLyric){

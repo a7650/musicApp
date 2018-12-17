@@ -3,6 +3,13 @@
     <div class="create-album-detail">
         <Header icon="icon-more" :title="this.name" @clickMore="clickMore"></Header>
         <Album :songList="songList" :name="name" :bgUrl="bgUrl" :desc="desc" @_selectMore="selectMore"></album>
+        <transition name="editAlbum">
+        <div v-if="editAlbum" class="edit-album">
+            <header><i class="icon-left" @click="closeEdit"></i><h5>编辑歌单</h5><span @click="saveEdit">保存</span></header>
+            <div class="name">名称<input type="tetx" v-model="name2"></div>
+            <div class="desc">简介<textarea v-model="desc"></textarea></div>
+        </div>
+        </transition>
         <filter-bg v-if="songHanders||albumHanders" @click.native="closeHanders"></filter-bg>
         <float v-if="float" :float_message="float_message"></float>
         <song-handle :othersHander="othersHander" v-if="songHanders" @othersHandle="othersHandle"></song-handle>
@@ -14,10 +21,10 @@
 
 <script>
 import rtol from "base/animation/right-to-left"
-import {getCreateAlbum,deleteFromAlbum} from 'common/js/cache'
+import {getCreateAlbum,deleteFromAlbum,editAlbum} from 'common/js/cache'
 import Header from 'base/header/header'
 import Album from 'base/album/album'
-import {_getLyric} from 'api/song'
+import {getLyric} from 'common/js/song'
 import Float from 'base/float/float'
 import filterBg from 'base/filter-bg/filter-bg'
 import songHandle from 'base/songHandle/songHandle'
@@ -34,6 +41,7 @@ export default {
             selectIndex:-1,
             songList:[],
             name:"",
+            name2:"",
             bgImg:"",
             desc:"",
             othersHander:[
@@ -42,20 +50,38 @@ export default {
                 {type:"_close",mes:"取消"}
             ],
             albumHander:[
-                {type:"_editDesc",mes:"编辑简介"},
+                {type:"_editAlbum",mes:"编辑歌单"},
                 {type:"_deleteAlbum",mes:"删除歌单"},
                 {type:"_close",mes:"取消"}
             ],
             albumHanders:false,
             alertMessage:"",
             alertButton:[],
-            alert:false
+            alert:false,
+            editAlbum:false
         }
     },
   components: {
     rtol,Header,Album,Float,songHandle,filterBg,alert
   },
   methods:{
+      saveEdit(){
+          if(this.name==="我的收藏"&&this.name2!=="我的收藏"){
+              this.mixin_float("默认歌单无法更改名称<br>你可以更改简介")
+              return
+          }
+          let m = editAlbum(this.name2,this.desc);
+          if(m.type===1){
+              this.editAlbum = false;
+          }
+          else{
+              this.mixin_float(m.mes);
+          }
+
+      },
+      closeEdit(){
+          this.editAlbum = false;
+      },
       _alert(mes,button){
           this.alertMessage = mes;
           this.alertButton = button;
@@ -76,8 +102,8 @@ export default {
             }
         }
       },
-      _editDesc(){
-          console.log("edit");
+      _editAlbum(){
+          this.editAlbum = true;
           this.closeHanders();
       },
       _deleteAlbum(){
@@ -90,26 +116,9 @@ export default {
           let album = getCreateAlbum(this.name);
           if(album.songList.length){
               this.songList = album.songList.map(item=>{
-               item.getLyric=function(){
-                    if(this.lyric){
-                    return Promise.resolve(this.lyric)
-                    }
-                    else{
-                        return new Promise((resolve,reject) => {
-                            _getLyric(this.mid).then(data => {
-                                if(data.retcode == 0){
-                                    this.lyric = Base64.decode(data.lyric);
-                                    resolve(this.lyric);
-                                }
-                                else{
-                                    reject("暂无歌词")
-                                }
-                            })
-                        })
-                    }
-               }
+               item.getLyric=getLyric;
                return item;
-          });
+              });
           }
           this.name = album.name;
           this.bgUrl = album.bgUrl;
@@ -150,6 +159,7 @@ export default {
   },
   created(){
       this.name = this.$route.params.id;
+      this.name2 = this.$route.params.id;
       this._getCreateAlbum()
   }
 };
@@ -167,5 +177,85 @@ export default {
   bottom: 0;
   background: #fff;
   color: #000;
+}
+.edit-album{
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: #fff;
+    color: #000;
+    header{
+        height: 40px;
+        line-height: 40px;
+        z-index: 99;
+        position: relative;
+        i{
+            display: inline-block;
+            width: 20%;
+            height: 100%;
+            line-height: 40px;
+            float: left;
+            box-sizing: border-box;
+            padding-left: 10px;
+            text-align: left;
+            font-size: 18px;
+        }
+        h5{
+            width: 60%;
+            text-align: center;
+            float: left;
+        }
+        span{
+            width: 20%;
+            float: left;
+            text-align: center;
+
+        }
+    }
+    .name{
+        margin-top: 30px;
+        height: 40px;
+        line-height: 40px;
+        width: 100%;
+        display: flex;
+        padding-left: 20px;
+        box-sizing: border-box;
+        input{
+            flex: 1;
+            margin-left: 20px;
+            margin-right: 20px;
+            height: 40px;
+            line-height: 40px;
+            border: none;
+            color: @color-text-d;
+            border-bottom: 1px solid rgba(0, 0, 0, .1);
+        }
+    }
+    .desc{
+        padding-left: 20px;
+        box-sizing: border-box;
+        display: flex;
+        margin-top: 30px;
+        textarea{
+            flex: 1;
+            height: 200px;
+            margin-left: 20px;
+            margin-right: 20px;
+            border: 1px solid rgba(0, 0, 0, .2);
+            resize: none;
+            color: @color-text-d;
+            font-size: @font-size-medium-x;
+        }
+    }
+}
+
+.editAlbum-enter-active,.editAlbum-leave-active{
+    transition: .3s;
+}
+.editAlbum-enter,.editAlbum-leave-to{
+    left: 100%;
+    right: -100%;
 }
 </style>

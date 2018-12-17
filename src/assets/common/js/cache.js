@@ -6,13 +6,18 @@ const MAX_HISTORYNUM = 20
 const MYALBUM_KEY = "_MY_ALBUM_"
 const COLLECTALBUM_KEY = "_COLLECT_ALBUM_"
 const CREATEALBUM_KEY = "_CREATE_ALBUM_"
+const PLAYHISTORY_KEY = "_PLAY_HISTORY_"
 //search 
-function resetArray(array,val,compare,maxnum){
+function resetArray(array,val,compare,maxnum,pos){
     let n = array.findIndex(compare);
     if (n > -1){
         array.splice(n,1)
     }
-    array.unshift(val);
+    if(pos){
+        array.splice(pos+1,0,val) 
+    }else{
+        array.unshift(val);
+    }
     if(array.length>maxnum){
         array.pop();
     }
@@ -83,13 +88,8 @@ export function setCreateAlbum(name,song){
             album.songList.unshift(song);
             album.bgUrl = song.image;
             let oldCreateAlbum = getCreateAlbum();
-            let newCreateAlbum = resetArray(oldCreateAlbum,album,(item) => {return item.name===name},999);
+            let newCreateAlbum = resetArray(oldCreateAlbum,album,item=>item.name===name,999,1);
             storage.set(CREATEALBUM_KEY,newCreateAlbum);
-            let m_album = getMyAlbum();
-            let x = m_album.findIndex(item=>item.name===name);
-            m_album[x].bgUrl = song.image;
-            storage.set(MYALBUM_KEY,m_album);
-
             return "添加成功"
         }catch(e){
             console.log(e);
@@ -116,13 +116,13 @@ export function createAlbum(name,desc){
     let all = getMyAlbum();
     let n = all.findIndex(item => item.name===name);
     if(n>-1){
-        return "该歌单已存在"
+        return {type:0,mes:"该歌单已存在"}
     }else{
         try{
             all.splice(1,0,{name,desc});
             storage.set(MYALBUM_KEY,all);
             let album = getCreateAlbum();
-            album.splice(1,0,{name,desc,bgImg:"",songList:[]});
+            album.splice(1,0,{name,desc,bgUrl:"",songList:[]});
             console.log(album);
             storage.set(CREATEALBUM_KEY,album);
             return {type:1,mes:"创建成功"}
@@ -150,6 +150,27 @@ export function deleteAlbum(name){
         return {type:1,mes:"删除成功<br>你还可以再听一下"}
     }catch(e){
         return {type:0,mes:"删除失败请重试"}
+    }
+}
+
+export function editAlbum(name2,desc2){
+    try{
+        let allAlbum = getCreateAlbum();
+        let n = allAlbum.findIndex(item=>item.name===name2);
+        if(n<0){
+            return {type:0,mes:"该歌单不存在"}
+        }
+        allAlbum[n].name = name2;
+        allAlbum[n].desc = desc2;
+        storage.set(CREATEALBUM_KEY,allAlbum);
+        let myAlbum = getMyAlbum();
+        let m = myAlbum.findIndex(item=>item.name===name2);
+        myAlbum[m].name = name2;
+        storage.set(MYALBUM_KEY,myAlbum)
+        return {type:1,mes:"歌单信息已成功更改"}
+    }catch(e){
+        console.log(e);
+        return {type:0,mes:"编辑失败，请重试"}
     }
 }
 
@@ -192,5 +213,16 @@ export function isCollect(album){
     let allalbum = getCollectAlbum();
     let n = allalbum.findIndex(item=>item.dissid===album.dissid);
     return n > -1;
+}
+
+
+
+export function getPlayHistory(){
+    return storage.get(PLAYHISTORY_KEY,[]);
+}
+export function setPlayHistory(song){
+    let all = getPlayHistory();
+    let newall = resetArray(all,song,item=>item.mid===song.mid,500);
+    storage.set(PLAYHISTORY_KEY,newall)
 }
 

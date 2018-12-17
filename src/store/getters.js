@@ -25,3 +25,5 @@ export const searchHistory = state => state.searchHistory
 export const myAlbum = state => state.myAlbum
 
 export const favoriteMid = state => state.favoriteMid
+
+export const collectAlbum = state => state.collectAlbum

@@ -1,7 +1,6 @@
 import * as types from './mutation-types'
-import {saveSearchHistory,clearSearchHistory,getMyAlbum} from 'common/js/cache'
+import {saveSearchHistory,clearSearchHistory,getMyAlbum,getCollectAlbum} from 'common/js/cache'
 import {getFavoriteMid,addFavorite,deleteFavorite} from 'common/js/favorite'
-import { type } from 'os';
 
 const mutations = {
     [types.SET_SINGER](state,singer){
@@ -109,6 +108,10 @@ const mutations = {
 
     [types.REFRESH_MYALBUM](state){
         state.myAlbum = getMyAlbum();
+    },
+
+    [types.REFRESH_COLLECTALBUM](state){
+        state.collectAlbum = getCollectAlbum();
     }
 
 

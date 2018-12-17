@@ -1,5 +1,5 @@
 import {playMode} from 'common/config'
-import {getSearchHistory,getMyAlbum} from 'common/js/cache'
+import {getSearchHistory,getMyAlbum,getCollectAlbum} from 'common/js/cache'
 import {getFavoriteMid} from 'common/js/favorite'
 
 const state = {
@@ -14,7 +14,8 @@ const state = {
     rankBar:false,
     searchHistory:getSearchHistory(),
     myAlbum:getMyAlbum(),
-    favoriteMid:getFavoriteMid()||[]
+    favoriteMid:getFavoriteMid()||[],
+    collectAlbum:getCollectAlbum()
 }
 
 export default state

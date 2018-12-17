@@ -42,13 +42,12 @@
 
 <script>
 import musicList from 'components/music-list/music-list'
-import {mapGetters} from 'vuex'
+import {mapGetters,mapMutations,mapActions} from 'vuex'
 import {getDiscSongList} from 'api/recommend'
 import {_encaseSongList} from 'common/js/song'
 import rtol from 'base/animation/right-to-left'
 import scroll from 'base/scroll/scroll'
 import discSonglist from 'base/disc-songlist/disc-songlist'
-import {mapActions} from 'vuex'
 import {adaptMiniPlay,float} from 'common/js/mixin'
 import {shuffle} from 'common/js/tools'
 import {formateHot} from 'common/js/tools'
@@ -101,6 +100,7 @@ export default {
            let m = setCollectAlbum({bgUrl:this.singer.imgurl||this.singer.bgUrl,name:this.singer.name||this.singer.creator.name,dissname:this.singer.dissname,dissid:this.singer.dissid,collectAlbum:true});
            if(m.type===1){
                this.isCollect = true;
+               this.REFRESH_COLLECTALBUM();
            }
            this._closeSongHandles(m.mes);
         },
@@ -108,6 +108,7 @@ export default {
             let m = deleteCollectAlbum(this.singer);
             if(m.type===1){
                 this.isCollect=false;
+                this.REFRESH_COLLECTALBUM()
             }
            this._closeSongHandles(m.mes);
          
@@ -173,6 +174,9 @@ export default {
         },
         ...mapActions([
             "selectSong"
+        ]),
+        ...mapMutations([
+            "REFRESH_COLLECTALBUM"
         ])
     },
     created(){
