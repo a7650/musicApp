@@ -185,6 +185,7 @@ export default {
     .myalbum-enter-active,.myalbum-leave-active{
       transition:.3s;
     }
+    
     .myalbum-enter,.myalbum-leave-to{
         left: -100%;
         right: 100%;

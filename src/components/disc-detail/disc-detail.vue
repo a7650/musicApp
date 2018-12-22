@@ -26,7 +26,7 @@
                     <img src="./drop.png" alt="">
                 </scroll>
                 <scroll class="song-content" ref="songContent" :data="songList" @scroll="scroll" :listenScroll="true" :probeType="3">
-                    <discSonglist :songList="songList" @selectMore="_selectMore" @selectSong="_selectSong" ref="disSonglist">
+                    <discSonglist  :songList="songList" @selectMore="_selectMore" @selectSong="_selectSong" ref="disSonglist">
                     </discSonglist>
                     <loading v-if="!songList.length"></loading>
                     <filter-bg v-if="songHandles||collectAlbum" @click.native="_closeSongHandles('')"></filter-bg>

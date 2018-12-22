@@ -14,7 +14,7 @@ module.exports = {
     //输出文件目录
     outputDir: 'dist',
     //放置生成的静态资源 (js、css、img、fonts) 的 (相对于 outputDir 的) 目录。
-    assetsDir: '',
+    assetsDir: './',
     //以多页模式构建应用程序。
     pages: undefined,
     //是否使用包含运行时编译器的 Vue 构建版本

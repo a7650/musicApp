@@ -153,10 +153,10 @@ export function deleteAlbum(name){
     }
 }
 
-export function editAlbum(name2,desc2){
+export function editAlbum(name1,name2,desc2){
     try{
         let allAlbum = getCreateAlbum();
-        let n = allAlbum.findIndex(item=>item.name===name2);
+        let n = allAlbum.findIndex(item=>item.name===name1);
         if(n<0){
             return {type:0,mes:"该歌单不存在"}
         }
@@ -164,12 +164,13 @@ export function editAlbum(name2,desc2){
         allAlbum[n].desc = desc2;
         storage.set(CREATEALBUM_KEY,allAlbum);
         let myAlbum = getMyAlbum();
-        let m = myAlbum.findIndex(item=>item.name===name2);
+        let m = myAlbum.findIndex(item=>item.name===name1);
+        console.log(m)
         myAlbum[m].name = name2;
         storage.set(MYALBUM_KEY,myAlbum)
         return {type:1,mes:"歌单信息已成功更改"}
     }catch(e){
-        console.log(e);
+        console.log(e)
         return {type:0,mes:"编辑失败，请重试"}
     }
 }

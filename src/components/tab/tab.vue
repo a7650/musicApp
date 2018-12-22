@@ -31,12 +31,16 @@ export default {
     line-height: 44px;
     font-size: @font-size-medium;
     background: @color-theme;
+          transition: .5s;
+
     .tab-item{
       flex: 1;
       text-align: center;
       .tab-link{
         padding-bottom: 5px;
         color: @color-text-ll;
+        transition: .3s;
+
       }
       &.router-link-active{
         .tab-link{

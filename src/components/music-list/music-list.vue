@@ -262,6 +262,7 @@ export default {
       background: #fff;
       padding-top: 20px;
       min-height: 100%;
+      border-radius: 5px;
     }
   }
 }

@@ -252,6 +252,7 @@ export default {
   .recommend-songs {
     text-align: center;
     background: @color-background;
+    border-radius: 5px;
     h5 {
       padding: 10px 0;
       color: @color-theme;

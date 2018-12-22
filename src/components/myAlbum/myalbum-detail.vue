@@ -70,9 +70,11 @@ export default {
               this.mixin_float("默认歌单无法更改名称<br>你可以更改简介")
               return
           }
-          let m = editAlbum(this.name2,this.desc);
+          let m = editAlbum(this.name,this.name2,this.desc);
           if(m.type===1){
               this.editAlbum = false;
+              this.name = this.name2;
+              this.REFRESH_MYALBUM();
           }
           else{
               this.mixin_float(m.mes);

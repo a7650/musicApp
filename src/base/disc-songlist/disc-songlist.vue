@@ -71,6 +71,7 @@ export default {
 @import "~common/stylus/mixin";
 .list{
     background: #fff;
+    border-radius: 5px;
 }
 .search{
     width: 100%;

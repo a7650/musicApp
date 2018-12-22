@@ -39,6 +39,8 @@ export default {
             transition:.3S;
             position: relative;
             overflow: hidden;
+            font-size: 15px;
+            border-radius: 2px;
             .border1,.border2{
                 transition: .3s;
                  height: 2px;
@@ -46,7 +48,6 @@ export default {
                  width: 100%;
                  position: absolute;
                  bottom: 0;
-        
             }
             .border1{
                 left: 100%;
@@ -58,6 +59,7 @@ export default {
        .router-link-active{
            background: rgba(0, 0, 0, .05);
            color: #000;
+           font-size: @font-size-large;
            .border1{
                left: 0;
            }
