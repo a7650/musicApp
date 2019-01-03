@@ -1,5 +1,5 @@
 <template>
-     <transition name="rtol" enter-active-class="animated pulse" leave-active-class="animated slideOutDown">
+     <transition name="player">
         <slot></slot>
     </transition>
 </template>
@@ -12,5 +12,12 @@ export default {
 </script>
 
 <style>
-
+.player-enter{
+    margin-top: 600px;
+    opacity: 0;
+}
+.player-leave-to{
+    transform: translate(0,100%);
+    opacity: .3;
+}
 </style>

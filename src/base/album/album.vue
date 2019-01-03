@@ -78,6 +78,9 @@ export default {
       });
     },
     randomPlay() {
+      if(!songList.length){
+        return
+      }
       let randomList = shuffle(this.songList);
       this.selectSong({
         list: randomList,
@@ -108,7 +111,7 @@ export default {
   .bg {
     width: 100%;
     height: 0;
-    padding-top: 70%;
+    padding-top: 60%;
     background-size: 110%;
     position: fixed;
     top: 0;
@@ -118,7 +121,7 @@ export default {
   .filter {
     width: 100%;
     height: 0;
-    padding-top: 70%;
+    padding-top: 60%;
     background-size: 110%;
     position: fixed;
     top: 0;

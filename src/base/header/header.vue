@@ -1,7 +1,7 @@
 <template>
         <header>
                <div class="back" @click = "back"> <i class="icon-left"></i></div>
-               <div class="title">{{title}}</div>
+               <div class="title" @click="clickTitle">{{title}}</div>
                <div class="more" @click="clickMore"><i :class=icon></i></div>
         </header>
 </template>
@@ -15,6 +15,9 @@ export default {
         },
         clickMore(){
             this.$emit("clickMore")
+        },
+        clickTitle(){
+            this.$emit("clickTitle")
         }
     }
 }

@@ -1,5 +1,5 @@
 <template>
-  <ani>
+  <transition name="handles">
     <div class="handles" ref="handles">
       <span
         ref="defaultHanders"
@@ -51,12 +51,11 @@
       >{{item.mes}}</span>
       <Float :float_message="float_message" v-if="float"></Float>
     </div>
-  </ani>
+  </transition>
 </template>
 
 <script>
 import { mapGetters, mapMutations, mapActions } from "vuex";
-import ani from "base/animation/mini-list-animation";
 import { setCreateAlbum, getCreateAlbum, createAlbum,getMyAlbum } from "common/js/cache";
 import Float from "base/float/float";
 import { float } from "common/js/mixin";
@@ -93,7 +92,6 @@ export default {
     ...mapGetters(["playList"])
   },
   components: {
-    ani,
     Float,
     scroll
   },
@@ -177,7 +175,7 @@ export default {
 @import "~common/stylus/variable";
 @import "~common/stylus/mixin";
 .handles {
-  animation-duration: 0.2s;
+  transition: .4s;
   position: fixed;
   bottom: 0;
   width: 100%;
@@ -185,7 +183,6 @@ export default {
   flex-direction: column;
   z-index: 99;
   background: #fff;
-
   &>span {
     width: 100%;
     flex: 1;
@@ -321,6 +318,10 @@ export default {
       }
     }
   }
+}
+.handles-enter,.handles-leave-to{
+  transform: translate(0,400px);
+  opacity: 0;
 }
 @keyframes bounce {
   0% {

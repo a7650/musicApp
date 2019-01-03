@@ -2,7 +2,7 @@
   <rtol>
     <div class="rank-detail">
       <div class="bg" ref="bg" :style="bgStyle"></div>
-      <Header :title="title" :icon="'icon-list'" @clickMore="clickMore"></Header>
+      <Header :title="title" :icon="'icon-list'" @clickMore="clickMore" @clickTitle="turnTop"></Header>
       <div class="bar" ref="bar">
         <div class="play" v-if="date">
           <i class="icon-play"></i>
@@ -91,6 +91,9 @@ export default {
     filterBg
   },
   methods: {
+    turnTop(){
+      this.$refs.songContent.scrollTo(0,0,500)
+    },
     clickMore() {
       this.SET_RANKBAR(true);
     },
@@ -127,14 +130,6 @@ export default {
           return;
         }
         this.songList = this._encaseSongList(data.songlist);
-        // console.log("--------------------------------------------------")
-        // console.log("详情信息");
-        // console.log(data);
-        // console.log("歌曲列表");
-        // console.log(this.songList);
-        // console.log("当前歌手");
-        // console.log(this.singer);
-        // console.log("--------------------------------------------------")
       });
     },
     _encaseSongList(list) {
@@ -156,9 +151,9 @@ export default {
         let item = result[j];
         getSongVkey(item.mid).then(res => {
           let vkey = res.data.items[0].vkey;
-          item.url = `http://dl.stream.qqmusic.qq.com/C400${
+          item.url = vkey?`http://dl.stream.qqmusic.qq.com/C400${
             item.mid
-          }.m4a?fromtag=38&guid=5931742855&vkey=${vkey}`;
+          }.m4a?fromtag=38&guid=5931742855&vkey=${vkey}`:"";
         });
       }
       return result;
@@ -204,7 +199,7 @@ export default {
 
 <style lang="less" scoped>
 .rank-detail {
-  animation-duration: 0.3s;
+  animation-duration: 0.2s;
   position: fixed;
   top: 0;
   left: 0;

@@ -1,5 +1,6 @@
 <template>
     <div class="song-list">
+        <slot></slot>
         <div v-if="search" class="search">
             <input  type="text"  v-model="searchText" placeholder="搜索此歌手的歌曲">
         </div>
@@ -14,7 +15,7 @@
         <ul>
             <li v-for="(song,index) in filterList" :class="{'c-song':(currentSong && song.id === currentSong.id),'noUrl':!song.url}" :key="index" @touchstart.once="audioPlay(song)" @click="_selectSong(song,index,filterList)">
                 <div class="song-container">
-                    <div class="song-name"  v-html="filterSong(song.name,song.id,currentSong.id,song.url)"></div>
+                    <div class="song-name"  v-html="filterCurrent(song.name,{id:[song.id,currentSong.id],mid:[song.mid,currentSong.mid],url:song.url})"></div>
                     <div class="desc" v-html="_getDesc(song)"></div>
                 </div>
                 <i class="icon-more" @click.stop="selectMore(song)"></i>
@@ -69,12 +70,18 @@ export default {
     },
     methods:{
         _getDesc(song){
-            return `${song.singer} - ${song.album}`
+            return `${song.singer} 《${song.album}》`
         },
         _selectSong(song,index,filterList){
+            if(!song.url){
+                return
+            }
             this.$emit("selectSong",song,index,filterList);
         },
         selectMore(song){
+            if(!song.url){
+                return
+            }
             this.$emit("selectMore",song)
         },
         audioPlay(song){
@@ -88,17 +95,6 @@ export default {
         selectZhida(){
             this.$emit("selectZhida",this.zhida);
         },
-        filterSong(val,id1,id2,url){
-            if(!url){
-                return `${val}(暂无音源)`
-            }
-            if(id1 === id2){
-                return `${val}(正在播放)`
-            }
-            else{
-                return val;
-            }
-        }
     },
 }
 </script>
@@ -108,6 +104,7 @@ export default {
 @import "~common/stylus/mixin";
 .song-list{
     background: #fff;
+    border: 1px solid transparent;
     .loading{
         width: 100%;
         height: 50px;
@@ -128,7 +125,7 @@ export default {
             width: 100%;
             height: 100%;
             border-radius: 2px;
-            background: rgba(0, 0, 0, .07)
+            background: rgb(236, 236, 236);
         }
     }
     .zhida{
@@ -200,11 +197,12 @@ export default {
         }
         i{
             width: 40px;
-            height: 50px;
-            text-align: right;
-            line-height: 50px;
+            height: 60px;
+            text-align: center;
+            line-height: 60px;
             font-size: @font-size-large-x;
             color: rgba(0, 0, 0, 0.4);
+            margin-right: -20px;
         }
         .noUrl{
             .song-name,.desc{

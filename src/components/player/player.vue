@@ -88,6 +88,7 @@
     </player-animation>
 
     <!-- mini-player -->
+    <transition name="mini">
     <div class="mini-player" v-show="!fullScreen" @click="showMainPlayer">
       <div class="mini-img">
         <div>
@@ -103,9 +104,10 @@
         <i class="icon-list" @click.stop="listShow=!listShow"></i>
       </div>
     </div>
+    </transition>
 
     <!-- mini-list -->
-    <div class="list-bg" v-show="listShow" @click="listShow=false"></div>
+    <transition name="list-bg"><div class="list-bg" v-show="listShow" @click="listShow=false"></div></transition>
     <mini-list-animation>
       <div class="mini-list" v-if="listShow">
         <header>
@@ -227,7 +229,7 @@ export default {
     audioReadyPlay() {
       this.readyPlay = true;
       if (this.currentLyric) {
-        this.currentLyric.seek(this.nowTime * 1000);
+        this.currentLyric.seek(this.nowTime*1000);
       }
     },
     timeupdate() {
@@ -337,7 +339,6 @@ export default {
             this.currentLyric.play();
             this.currentLyric.seek(this.nowTime * 1000);
           }
-          // console.log(this.currentLyric);
         })
         .catch(() => {
           this.noLyric = true;
@@ -426,9 +427,14 @@ export default {
   },
   watch: {
     currentSong(newSong, oldSong) {
-      if (!newSong.id || !newSong.url || newSong.id === oldSong.id) {
-        return;
+      if (newSong.mid === oldSong.mid && newSong.id === oldSong.id) {
+        return
       }
+      if(!newSong.mid || !newSong.url){
+        this.nextSong();
+        return
+      }
+
       this.readyPlay = false;
       this.ready = false;
       if (this.currentLyric) {
@@ -443,16 +449,6 @@ export default {
       this.$refs.audio.play();
       this.SET_PLAYING(true);
       setPlayHistory(this.currentSong)
-      // if(this.timer){clearTimeout(this.timer)}
-      // this.timer = setTimeout(() => {
-      //     if(this.currentLyric){
-      //         this.currentLyric.seek(this.nowTime*1000)
-      //         if(!this.playing){
-      //             this.currentLyric.toggle();
-      //         }
-      //         this.timer = null;
-      //     }
-      // }, 5000);
       if (this.timer2) {
         clearTimeout(this.timer2);
       }
@@ -460,9 +456,6 @@ export default {
         this.ready = true;
         this.timer2 = null;
       }, 1000);
-
-      // clearTimeout(this.timer);
-      // this.comNowTime();
     },
     playing() {
       this.$nextTick(() => {
@@ -474,11 +467,19 @@ export default {
         }
       });
     },
-    fullScreen() {
-      if (this.playing && this.fullScreen && this.currentLyric) {
-        this.currentLyric.seek(this.nowTime * 1000);
-      }
-    }
+    // fullScreen(n,o) {
+      // if(n&&this.currentLyric){
+      //   this.currentLyric.seek(this.nowTime * 1000);
+        // if(!this.playing){
+        //   this.currentLyric.toggle();
+        // }
+        //   setTimeout(() => {
+        //     let el = this.$refs.lyricList[this.lyricLine];
+        //     this.$refs.lyricLists.scrollTo(0,200);
+        //     console.log(el.innerHTML)
+        //   }, 0);
+      // }
+    // }
   },
   created() {
     this.touch = {};
@@ -509,7 +510,7 @@ export default {
   display: flex;
   flex-direction: column;
   background-color: rgb(109, 109, 109);
-  animation-duration: 0.3s;
+  transition: .3s;
   .bg {
     position: fixed;
     width: 100%;
@@ -749,7 +750,6 @@ export default {
     }
   }
 }
-
 .mini-player {
   position: fixed;
   top: 92%;
@@ -762,6 +762,7 @@ export default {
   display: flex;
   align-items: center;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
+  transition: .3s;
   .mini-img {
     width: 10%;
     height: 0;
@@ -831,24 +832,24 @@ export default {
   bottom: 0;
   right: 0;
   background: rgba(0, 0, 0, 0.3);
+  transition: .5s;
 }
-
+.list-bg-enter,.list-bg-leave-to{
+  opacity: 0;
+}
 .mini-list {
   z-index: 101;
-  position: fixed;
+  position: absolute;
   top: 30%;
   left: 0;
   right: 0;
   bottom: 0;
   background: rgba(255, 255, 255, 0.95);
-  animation-duration: 0.3s;
- 
+  transition: .3s;
   header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 93%;
+    height: 30px;
+    width: 100%;
+    box-sizing: border-box;
     padding: 0 5%;
     display: flex;
     align-items: center;
@@ -870,7 +871,7 @@ export default {
   }
   .list-content {
     position: absolute;
-    top: 7%;
+    top: 30px;
     left: 0;
     right: 0;
     bottom: 10%;
@@ -897,5 +898,9 @@ export default {
   100% {
     transform: rotate(360deg);
   }
+}
+.mini-enter,.mini-leave-to{
+  top: 100%;
+  bottom: -8%;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-     <transition name="rtol" enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown">
+     <transition name="m">
         <slot></slot>
     </transition>
 </template>
@@ -12,5 +12,9 @@ export default {
 </script>
 
 <style>
+.m-enter,.m-leave-to{
+    transform: translate(0,100px);
+    opacity: 0;
+}
 
 </style>
